@@ -1,0 +1,303 @@
+# 📄 phase-1.md
+
+## Ontology Ingestion, Parsing & Canonical Model
+
+------------------------------------------------------------------------
+
+## 🎯 Phase 1 Objective
+
+Phase 1 establishes the **entire semantic foundation** of the system.
+Its purpose is to ingest one or more cascading OWL/Turtle ontologies,
+resolve their import dependency graphs, normalize all RDF triples,
+extract OWL entities, compute class and property relationships, and
+expose a stable, deterministic **canonical ontology query API** for all
+downstream UI, visualization, and export layers.
+
+------------------------------------------------------------------------
+
+## 🧩 Section 1.1 --- Ontology File Loading & Import Resolution
+
+This section ensures that one or more Turtle ontology files can be
+loaded together into a **single logical ontology graph**, while fully
+resolving recursive `owl:imports` relationships. Provenance must be
+preserved and import cycles must be safely detected and rejected.
+
+------------------------------------------------------------------------
+
+### ✅ Task 1.1.1 --- Load Root Ontology Files
+
+-   [ ] 1.1.1.1 Implement `.ttl` file reader\
+-   [ ] 1.1.1.2 Validate file existence and readability\
+-   [ ] 1.1.1.3 Register file metadata (path, base IRI, prefix map)
+
+------------------------------------------------------------------------
+
+### ✅ Task 1.1.2 --- Resolve `owl:imports` Recursively
+
+-   [ ] 1.1.2.1 Parse `owl:imports` triples\
+-   [ ] 1.1.2.2 Load all imported ontologies\
+-   [ ] 1.1.2.3 Build recursive import chain\
+-   [ ] 1.1.2.4 Preserve ontology-of-origin for each triple
+
+------------------------------------------------------------------------
+
+### ✅ Task 1.1.3 --- Import Cycle Detection
+
+-   [ ] 1.1.3.1 Detect circular dependencies\
+-   [ ] 1.1.3.2 Abort load on cycle detection\
+-   [ ] 1.1.3.3 Emit diagnostic dependency trace
+
+------------------------------------------------------------------------
+
+### ✅ Task 1.1.99 --- Unit Tests: Ontology Import Resolution
+
+-   [ ] 1.1.99.1 Loads a single ontology correctly\
+-   [ ] 1.1.99.2 Resolves multi-level imports correctly\
+-   [ ] 1.1.99.3 Detects circular imports reliably\
+-   [ ] 1.1.99.4 Preserves per-ontology provenance correctly
+
+------------------------------------------------------------------------
+
+## 🧩 Section 1.2 --- RDF Triple Parsing & Canonical Normalization
+
+This section converts raw Turtle syntax into a **canonical RDF triple
+store** independent of source formatting. This normalized layer becomes
+the sole foundation for all OWL semantic extraction.
+
+------------------------------------------------------------------------
+
+### ✅ Task 1.2.1 --- RDF Triple Parsing
+
+-   [ ] 1.2.1.1 Parse `(subject, predicate, object)` triples\
+-   [ ] 1.2.1.2 Normalize IRIs\
+-   [ ] 1.2.1.3 Expand prefix mappings\
+-   [ ] 1.2.1.4 Separate literals from IRIs
+
+------------------------------------------------------------------------
+
+### ✅ Task 1.2.2 --- Blank Node Stabilization
+
+-   [ ] 1.2.2.1 Detect blank nodes\
+-   [ ] 1.2.2.2 Generate stable internal identifiers\
+-   [ ] 1.2.2.3 Preserve blank node reference consistency
+
+------------------------------------------------------------------------
+
+### ✅ Task 1.2.3 --- Triple Indexing Engine
+
+-   [ ] 1.2.3.1 Index by subject\
+-   [ ] 1.2.3.2 Index by predicate\
+-   [ ] 1.2.3.3 Index by object
+
+------------------------------------------------------------------------
+
+### ✅ Task 1.2.99 --- Unit Tests: Triple Normalization
+
+-   [ ] 1.2.99.1 IRIs normalized correctly\
+-   [ ] 1.2.99.2 Prefixed names expand correctly\
+-   [ ] 1.2.99.3 Blank nodes stabilize\
+-   [ ] 1.2.99.4 Triple indexes resolve correctly
+
+------------------------------------------------------------------------
+
+## 🧩 Section 1.3 --- OWL Entity Extraction
+
+This section extracts all OWL semantic entities including **classes,
+object properties, data properties, and individuals** across all
+imported ontologies.
+
+------------------------------------------------------------------------
+
+### ✅ Task 1.3.1 --- Class Extraction
+
+-   [ ] 1.3.1.1 Detect `owl:Class`\
+-   [ ] 1.3.1.2 Extract class IRIs\
+-   [ ] 1.3.1.3 Attach ontology-of-origin metadata
+
+------------------------------------------------------------------------
+
+### ✅ Task 1.3.2 --- Object Property Extraction
+
+-   [ ] 1.3.2.1 Detect `owl:ObjectProperty`\
+-   [ ] 1.3.2.2 Register domain placeholders\
+-   [ ] 1.3.2.3 Register range placeholders
+
+------------------------------------------------------------------------
+
+### ✅ Task 1.3.3 --- Data Property Extraction
+
+-   [ ] 1.3.3.1 Detect `owl:DataProperty`\
+-   [ ] 1.3.3.2 Register datatype ranges
+
+------------------------------------------------------------------------
+
+### ✅ Task 1.3.4 --- Individual Extraction
+
+-   [ ] 1.3.4.1 Detect named individuals\
+-   [ ] 1.3.4.2 Associate individuals with their classes
+
+------------------------------------------------------------------------
+
+### ✅ Task 1.3.99 --- Unit Tests: OWL Entity Extraction
+
+-   [ ] 1.3.99.1 Detects all classes correctly\
+-   [ ] 1.3.99.2 Detects all properties correctly\
+-   [ ] 1.3.99.3 Detects all individuals correctly\
+-   [ ] 1.3.99.4 Prevents duplicate IRIs
+
+------------------------------------------------------------------------
+
+## 🧩 Section 1.4 --- Class Hierarchy Graph Construction
+
+This section builds the **full subclass taxonomy** using
+`rdfs:subClassOf`, enabling hierarchical exploration and graph
+visualization.
+
+------------------------------------------------------------------------
+
+### ✅ Task 1.4.1 --- Parent → Child Graph
+
+-   [ ] 1.4.1.1 Build subclass adjacency list\
+-   [ ] 1.4.1.2 Normalize `owl:Thing` as root
+
+------------------------------------------------------------------------
+
+### ✅ Task 1.4.2 --- Child → Parent Graph
+
+-   [ ] 1.4.2.1 Build reverse lookup index\
+-   [ ] 1.4.2.2 Enable ancestry traversal
+
+------------------------------------------------------------------------
+
+### ✅ Task 1.4.3 --- Multiple Inheritance Detection
+
+-   [ ] 1.4.3.1 Detect multiple parents\
+-   [ ] 1.4.3.2 Preserve all inheritance paths
+
+------------------------------------------------------------------------
+
+### ✅ Task 1.4.99 --- Unit Tests: Class Hierarchy
+
+-   [ ] 1.4.99.1 Builds correct subclass chains\
+-   [ ] 1.4.99.2 Supports multiple inheritance\
+-   [ ] 1.4.99.3 Detects root classes correctly
+
+------------------------------------------------------------------------
+
+## 🧩 Section 1.5 --- Property Domain & Range Resolution
+
+This section establishes **semantic connectivity** between classes using
+OWL object and data property definitions.
+
+------------------------------------------------------------------------
+
+### ✅ Task 1.5.1 --- Domain Resolution
+
+-   [ ] 1.5.1.1 Extract `rdfs:domain`\
+-   [ ] 1.5.1.2 Map outbound relation tables
+
+------------------------------------------------------------------------
+
+### ✅ Task 1.5.2 --- Range Resolution
+
+-   [ ] 1.5.2.1 Extract `rdfs:range`\
+-   [ ] 1.5.2.2 Map inbound relation tables
+
+------------------------------------------------------------------------
+
+### ✅ Task 1.5.3 --- Data Property Typing
+
+-   [ ] 1.5.3.1 Attach XSD datatype IRIs\
+-   [ ] 1.5.3.2 Validate datatype semantics
+
+------------------------------------------------------------------------
+
+### ✅ Task 1.5.99 --- Unit Tests: Property Mappings
+
+-   [ ] 1.5.99.1 Domains resolve correctly\
+-   [ ] 1.5.99.2 Ranges resolve correctly\
+-   [ ] 1.5.99.3 Object/data properties are separated correctly
+
+------------------------------------------------------------------------
+
+## 🧩 Section 1.6 --- Annotation & Documentation Metadata
+
+This section extracts and normalizes all **human-readable documentation
+signals** intended for UI rendering.
+
+------------------------------------------------------------------------
+
+### ✅ Task 1.6.1 --- Label Extraction
+
+-   [ ] 1.6.1.1 Extract `rdfs:label`\
+-   [ ] 1.6.1.2 Preserve language tags
+
+------------------------------------------------------------------------
+
+### ✅ Task 1.6.2 --- Comment & Definition Extraction
+
+-   [ ] 1.6.2.1 Extract `rdfs:comment`\
+-   [ ] 1.6.2.2 Extract `skos:definition`\
+-   [ ] 1.6.2.3 Extract `dc:description`
+
+------------------------------------------------------------------------
+
+### ✅ Task 1.6.99 --- Unit Tests: Annotations
+
+-   [ ] 1.6.99.1 Multi-language labels supported\
+-   [ ] 1.6.99.2 Comments bind to correct entities
+
+------------------------------------------------------------------------
+
+## 🧩 Section 1.7 --- Canonical Ontology Query API
+
+This section defines the **official semantic boundary** between ontology
+infrastructure and all UI layers.
+
+------------------------------------------------------------------------
+
+### ✅ Task 1.7.1 --- Public Query Functions
+
+-   [ ] 1.7.1.1 Implement `list_classes/0`\
+-   [ ] 1.7.1.2 Implement `get_class/1`\
+-   [ ] 1.7.1.3 Implement `list_properties/0`\
+-   [ ] 1.7.1.4 Implement `get_property/1`\
+-   [ ] 1.7.1.5 Implement `get_inbound_relations/1`\
+-   [ ] 1.7.1.6 Implement `get_outbound_relations/1`
+
+------------------------------------------------------------------------
+
+### ✅ Task 1.7.99 --- Unit Tests: Query API
+
+-   [ ] 1.7.99.1 Query consistency guaranteed\
+-   [ ] 1.7.99.2 Import completeness guaranteed\
+-   [ ] 1.7.99.3 Deterministic ordering enforced
+
+------------------------------------------------------------------------
+
+## 🔗 Section 1.99 --- Phase 1 Integration Testing
+
+This section validates that **all ontologies operate as a single unified
+semantic graph**.
+
+------------------------------------------------------------------------
+
+### ✅ Task 1.99.1 --- Multi-Ontology Load Validation
+
+-   [ ] 1.99.1.1 Load all 5 Elixir ontologies together\
+-   [ ] 1.99.1.2 Resolve full import dependency chain
+
+------------------------------------------------------------------------
+
+### ✅ Task 1.99.2 --- Cross-Ontology Graph Traversal
+
+-   [ ] 1.99.2.1 Traverse subclass chains across ontology boundaries\
+-   [ ] 1.99.2.2 Traverse property relations across ontology boundaries
+
+------------------------------------------------------------------------
+
+### ✅ Task 1.99.3 --- Global Integrity Validation
+
+-   [ ] 1.99.3.1 Validate zero duplicate entities\
+-   [ ] 1.99.3.2 Validate all IRIs dereference cleanly
+
