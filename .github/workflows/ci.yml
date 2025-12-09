@@ -1,0 +1,95 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - develop
+      - main
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up BEAM (Erlang/Elixir)
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: "1.17.3"
+          otp-version: "27.0"
+
+      - name: Cache Mix dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            deps
+            _build
+          key: mix-${{ runner.os }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            mix-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: |
+          mix deps.get
+
+      - name: Check formatting
+        run: |
+          mix format --check-formatted
+
+      - name: Compile (warnings as errors)
+        run: |
+          MIX_ENV=test mix compile --warnings-as-errors
+
+      - name: Run unit and integration tests
+        run: |
+          MIX_ENV=test mix test
+
+      - name: Validate ontology TTL files
+        run: |
+          if [ -f ./scripts/validate_ttl.sh ]; then
+            chmod +x ./scripts/validate_ttl.sh
+            ./scripts/validate_ttl.sh
+          else
+            echo "No TTL validation script found at ./scripts/validate_ttl.sh — skipping."
+          fi
+
+      - name: Security checks (optional)
+        run: |
+          if mix help deps.audit >/dev/null 2>&1; then
+            mix deps.audit
+          else
+            echo "deps.audit not installed — skipping."
+          fi
+
+  docs-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate markdown structure
+        run: |
+          echo "Validating presence of key documentation files"
+          test -f README.md
+          test -f overview.md
+          test -f phase-1.md
+          test -f phase-2.md
+          test -f phase-3.md
+          test -f phase-4.md
+          test -f phase-5.md
+          test -f CONTRIBUTING.md
+          test -f CODE_OF_CONDUCT.md
+          test -f SECURITY.md
+          test -f RELEASING.md
+          echo "All required documentation files present."
+

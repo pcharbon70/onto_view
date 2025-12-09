@@ -1,0 +1,7 @@
+
+blank_issues_enabled: false
+contact_links:
+  - name: Architecture / Design Question
+    url: https://github.com/pcharbon70/onto_view/discussions
+    about: Ask questions about ontology design, architecture, or phases here.
+
