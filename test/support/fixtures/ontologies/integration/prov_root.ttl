@@ -1,0 +1,15 @@
+@prefix : <http://example.org/prov_root#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<http://example.org/prov_root#> a owl:Ontology ;
+    rdfs:label "Provenance Root Ontology" ;
+    rdfs:comment "Root ontology with exactly 10 triples for provenance testing" ;
+    owl:imports <http://example.org/prov_child#> .
+
+:RootClass a owl:Class ;
+    rdfs:label "Root Class" ;
+    rdfs:comment "Class defined in root ontology" .
+
+:RootProperty a owl:ObjectProperty ;
+    rdfs:label "Root Property" .

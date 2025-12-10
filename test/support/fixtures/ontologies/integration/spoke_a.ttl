@@ -1,0 +1,14 @@
+@prefix : <http://example.org/spoke_a#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<http://example.org/spoke_a#> a owl:Ontology ;
+    rdfs:label "Spoke A Ontology" .
+
+:ClassA1 a owl:Class ;
+    rdfs:label "Class A1" ;
+    rdfs:comment "First class in spoke A" .
+
+:ClassA2 a owl:Class ;
+    rdfs:label "Class A2" ;
+    rdfs:comment "Second class in spoke A" .

@@ -1,0 +1,14 @@
+@prefix : <http://example.org/deep_level_4#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<http://example.org/deep_level_4#> a owl:Ontology ;
+    rdfs:label "Deep Level 4 Ontology (Leaf)" ;
+    rdfs:comment "Deepest level ontology with actual classes" .
+
+:LeafClass a owl:Class ;
+    rdfs:label "Leaf Class" ;
+    rdfs:comment "Class at the deepest level of the import chain" .
+
+:AnotherLeafClass a owl:Class ;
+    rdfs:label "Another Leaf Class" .
