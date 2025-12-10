@@ -38,10 +38,14 @@ preserved and import cycles must be safely detected and rejected.
 
 ### ✅ Task 1.1.2 --- Resolve `owl:imports` Recursively
 
--   [ ] 1.1.2.1 Parse `owl:imports` triples\
--   [ ] 1.1.2.2 Load all imported ontologies\
--   [ ] 1.1.2.3 Build recursive import chain\
--   [ ] 1.1.2.4 Preserve ontology-of-origin for each triple
+-   [x] 1.1.2.1 Parse `owl:imports` triples\
+-   [x] 1.1.2.2 Load all imported ontologies\
+-   [x] 1.1.2.3 Build recursive import chain\
+-   [x] 1.1.2.4 Preserve ontology-of-origin for each triple
+
+**Status:** ✅ COMPLETED (2025-12-10)
+**Implementation:** `lib/onto_view/ontology/import_resolver.ex`
+**Tests:** `test/onto_view/ontology/import_resolver_test.exs` (15 tests, 88.5% coverage)
 
 ------------------------------------------------------------------------
 
