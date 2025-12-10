@@ -5,6 +5,7 @@ defmodule OntoView.Ontology.ImportResolverTest do
 
   @fixtures_dir "test/support/fixtures/ontologies"
   @imports_dir Path.join(@fixtures_dir, "imports")
+  @cycles_dir Path.join(@fixtures_dir, "cycles")
 
   describe "extract_imports/1" do
     test "extracts owl:imports statements from graph" do
@@ -166,6 +167,117 @@ defmodule OntoView.Ontology.ImportResolverTest do
 
       # Each graph should have distinct triples
       assert length(graphs) >= 1
+    end
+  end
+
+  describe "cycle detection (Task 1.1.3)" do
+    # 1.1.3.1 - Detect circular dependencies
+    test "detects direct circular dependency (A → B → A)" do
+      path = Path.join(@cycles_dir, "cycle_a.ttl")
+
+      assert {:error, {:circular_dependency, trace}} =
+               ImportResolver.load_with_imports(path)
+
+      assert trace.cycle_detected_at == "http://example.org/cycle_a#"
+      assert "http://example.org/cycle_a#" in trace.import_path
+      assert "http://example.org/cycle_b#" in trace.import_path
+      assert trace.cycle_length == 2
+    end
+
+    test "detects indirect circular dependency (A → B → C → A)" do
+      path = Path.join(@cycles_dir, "indirect_a.ttl")
+
+      assert {:error, {:circular_dependency, trace}} =
+               ImportResolver.load_with_imports(path)
+
+      assert trace.cycle_length == 3
+      assert length(trace.import_path) == 4
+      # A, B, C, A
+    end
+
+    test "detects self-import (A → A)" do
+      path = Path.join(@cycles_dir, "self_import.ttl")
+
+      assert {:error, {:circular_dependency, trace}} =
+               ImportResolver.load_with_imports(path)
+
+      assert trace.cycle_length == 1
+      assert trace.cycle_detected_at == "http://example.org/self#"
+    end
+
+    # 1.1.3.2 - Abort load on cycle detection
+    test "aborts immediately on cycle detection" do
+      path = Path.join(@cycles_dir, "cycle_a.ttl")
+
+      result = ImportResolver.load_with_imports(path)
+
+      assert {:error, {:circular_dependency, _}} = result
+      # Verify no partial state was returned (only error tuple)
+    end
+
+    test "does not confuse diamond pattern with cycle" do
+      path = Path.join(@cycles_dir, "diamond_root.ttl")
+
+      # Diamond: root → left → base, root → right → base
+      # Base appears in two paths but isn't a cycle
+      assert {:ok, result} = ImportResolver.load_with_imports(path)
+
+      # Should successfully load all 4 ontologies
+      assert map_size(result.ontologies) == 4
+    end
+
+    # 1.1.3.3 - Emit diagnostic dependency trace
+    test "provides human-readable cycle trace" do
+      path = Path.join(@cycles_dir, "indirect_a.ttl")
+
+      assert {:error, {:circular_dependency, trace}} =
+               ImportResolver.load_with_imports(path)
+
+      assert is_binary(trace.human_readable)
+      assert trace.human_readable =~ "[CYCLE START]"
+      assert trace.human_readable =~ "→"
+    end
+
+    test "cycle trace shows exact import chain" do
+      path = Path.join(@cycles_dir, "cycle_a.ttl")
+
+      assert {:error, {:circular_dependency, trace}} =
+               ImportResolver.load_with_imports(path)
+
+      # Verify the path shows: A → B → A
+      assert trace.import_path == [
+               "http://example.org/cycle_a#",
+               "http://example.org/cycle_b#",
+               "http://example.org/cycle_a#"
+             ]
+    end
+
+    test "cycle trace includes cycle start marker" do
+      path = Path.join(@cycles_dir, "cycle_a.ttl")
+
+      assert {:error, {:circular_dependency, trace}} =
+               ImportResolver.load_with_imports(path)
+
+      # The marker should be at the point where the cycle starts
+      assert trace.human_readable =~ "[CYCLE START] http://example.org/cycle_a#"
+    end
+
+    test "cycle detection works with max depth option" do
+      path = Path.join(@cycles_dir, "cycle_a.ttl")
+
+      # Even with high max depth, cycle should be detected first
+      assert {:error, {:circular_dependency, _trace}} =
+               ImportResolver.load_with_imports(path, max_depth: 100)
+    end
+
+    test "cycle length is accurate" do
+      path = Path.join(@cycles_dir, "indirect_a.ttl")
+
+      assert {:error, {:circular_dependency, trace}} =
+               ImportResolver.load_with_imports(path)
+
+      # A → B → C → A forms a 3-ontology cycle
+      assert trace.cycle_length == 3
     end
   end
 end

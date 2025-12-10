@@ -51,9 +51,13 @@ preserved and import cycles must be safely detected and rejected.
 
 ### ✅ Task 1.1.3 --- Import Cycle Detection
 
--   [ ] 1.1.3.1 Detect circular dependencies\
--   [ ] 1.1.3.2 Abort load on cycle detection\
--   [ ] 1.1.3.3 Emit diagnostic dependency trace
+-   [x] 1.1.3.1 Detect circular dependencies\
+-   [x] 1.1.3.2 Abort load on cycle detection\
+-   [x] 1.1.3.3 Emit diagnostic dependency trace
+
+**Status:** ✅ COMPLETED (2025-12-10)
+**Implementation:** `lib/onto_view/ontology/import_resolver.ex`
+**Tests:** `test/onto_view/ontology/import_resolver_test.exs` (41 tests total, 89.5% coverage)
 
 ------------------------------------------------------------------------
 
