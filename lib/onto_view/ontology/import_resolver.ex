@@ -42,6 +42,7 @@ defmodule OntoView.Ontology.ImportResolver do
           base_iri: String.t(),
           prefix_map: %{String.t() => String.t()},
           imports: [String.t()],
+          graph: RDF.Graph.t(),
           triple_count: non_neg_integer(),
           loaded_at: DateTime.t(),
           depth: non_neg_integer()
@@ -256,10 +257,19 @@ defmodule OntoView.Ontology.ImportResolver do
   # Task 1.1.2.2: IRI Resolution
   defp resolve_import_iri(iri, resolver) do
     cond do
-      # Strategy 1: File URI
+      # Strategy 1: File URI (with path traversal protection)
       String.starts_with?(iri, "file://") ->
         path = String.replace_prefix(iri, "file://", "")
-        {:ok, Path.expand(path)}
+        absolute_path = Path.expand(path)
+        allowed_base = Path.expand(resolver.base_dir)
+
+        # Validate path stays within allowed base directory
+        if String.starts_with?(absolute_path, allowed_base <> "/") or absolute_path == allowed_base do
+          {:ok, absolute_path}
+        else
+          Logger.warning("Unauthorized file access attempt blocked: #{iri} -> #{absolute_path}")
+          {:error, {:unauthorized_path, "File URI outside allowed directory"}}
+        end
 
       # Strategy 2: Explicit mapping
       Map.has_key?(resolver.mappings, iri) ->
@@ -333,6 +343,7 @@ defmodule OntoView.Ontology.ImportResolver do
       base_iri: ontology.base_iri,
       prefix_map: ontology.prefix_map,
       imports: imports,
+      graph: ontology.graph,
       triple_count: RDF.Graph.triple_count(ontology.graph),
       loaded_at: ontology.loaded_at,
       depth: depth
@@ -357,22 +368,9 @@ defmodule OntoView.Ontology.ImportResolver do
     dataset =
       ontologies_map
       |> Enum.reduce(RDF.Dataset.new(), fn {iri, metadata}, acc ->
-        # Reload the file to get the graph
-        # Note: In future optimization, we could cache graphs during loading
-        path = metadata[:path] || metadata["path"]
-
-        if path do
-          case Loader.load_file(path) do
-            {:ok, ontology} ->
-              graph_name = RDF.iri(iri)
-              RDF.Dataset.add(acc, ontology.graph, graph_name: graph_name)
-
-            _ ->
-              acc
-          end
-        else
-          acc
-        end
+        # Use cached graph from metadata (optimization: eliminates file reloading)
+        graph_name = RDF.iri(iri)
+        RDF.Dataset.add(acc, metadata.graph, graph_name: graph_name)
       end)
 
     {:ok, dataset}

@@ -111,6 +111,10 @@ defmodule OntoView.Ontology.Loader do
       not File.exists?(absolute_path) ->
         {:error, :file_not_found}
 
+      is_symlink?(absolute_path) ->
+        Logger.warning("Symlink detected and rejected: #{absolute_path}")
+        {:error, {:symlink_detected, "Symlinks are not allowed for security"}}
+
       not File.regular?(absolute_path) ->
         {:error, {:not_a_file, "Path is a directory or special file"}}
 
@@ -123,11 +127,33 @@ defmodule OntoView.Ontology.Loader do
     end
   end
 
+  defp is_symlink?(path) do
+    case File.lstat(path) do
+      {:ok, %File.Stat{type: :symlink}} -> true
+      _ -> false
+    end
+  end
+
   defp check_file_readable(path) do
-    case File.read(path) do
-      {:ok, _} -> {:ok, path}
+    max_size = Application.get_env(:onto_view, :ontology_loader)[:max_file_size_bytes]
+
+    with {:ok, %File.Stat{size: size}} <- File.stat(path),
+         :ok <- validate_file_size(size, max_size),
+         {:ok, _contents} <- File.read(path) do
+      {:ok, path}
+    else
       {:error, :eacces} -> {:error, :permission_denied}
+      {:error, {:file_too_large, _}} = error -> error
       {:error, reason} -> {:error, {:io_error, inspect(reason)}}
+    end
+  end
+
+  defp validate_file_size(size, max_size) do
+    if size > max_size do
+      Logger.warning("File exceeds size limit: #{size} bytes (max: #{max_size})")
+      {:error, {:file_too_large, "File exceeds #{max_size} bytes limit (got #{size} bytes)"}}
+    else
+      :ok
     end
   end
 
