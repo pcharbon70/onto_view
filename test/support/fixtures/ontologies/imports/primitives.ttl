@@ -1,0 +1,16 @@
+@prefix : <http://example.org/primitives#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<http://example.org/primitives#> a owl:Ontology ;
+    rdfs:label "Primitives Ontology"@en ;
+    rdfs:comment "Base primitive types"@en .
+
+:Integer a owl:Class ;
+    rdfs:label "Integer"@en ;
+    rdfs:comment "Integer primitive type"@en .
+
+:String a owl:Class ;
+    rdfs:label "String"@en ;
+    rdfs:comment "String primitive type"@en .
