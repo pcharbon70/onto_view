@@ -1,0 +1,5 @@
+@prefix elixir: <http://example.org/elixir/core#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+elixir:SomeClass a rdfs:Class ;
+    rdfs:label "Some Class"@en .

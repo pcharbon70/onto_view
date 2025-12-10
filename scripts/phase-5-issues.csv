@@ -1,0 +1,112 @@
+title,body,labels,milestone
+Task 5.1.1 — Raw Ontology Download,"Implements raw per-ontology Turtle exports.
+
+### Subtasks
+- [ ] 5.1.1.1 Expose per-ontology TTL download
+- [ ] 5.1.1.2 Validate correct content-type headers
+- [ ] 5.1.1.3 Preserve original namespace prefixes
+","phase:5-export-deployment,section:5.1-export,type:feature,ontology:export","Phase 5 – Ontology Export, CI/CD & Production Deployment"
+Task 5.1.2 — Merged Ontology Export,"Implements merged ontology export.
+
+### Subtasks
+- [ ] 5.1.2.1 Merge all imported ontologies into a single graph
+- [ ] 5.1.2.2 Export merged ontology as Turtle
+- [ ] 5.1.2.3 Maintain import provenance metadata
+","phase:5-export-deployment,section:5.1-export,type:feature,ontology:export","Phase 5 – Ontology Export, CI/CD & Production Deployment"
+Task 5.1.3 — JSON Export for Visualization APIs,"Implements JSON exports for UI and APIs.
+
+### Subtasks
+- [ ] 5.1.3.1 Export class graph as JSON
+- [ ] 5.1.3.2 Export property relations as JSON
+- [ ] 5.1.3.3 Export individuals as JSON
+","phase:5-export-deployment,section:5.1-export,type:feature,ontology:export","Phase 5 – Ontology Export, CI/CD & Production Deployment"
+Task 5.1.99 — Unit Tests: Ontology Export,Unit tests for all ontology export endpoints.,"phase:5-export-deployment,section:5.1-export,type:testing,ontology:export","Phase 5 – Ontology Export, CI/CD & Production Deployment"
+Task 5.2.1 — Ontology Version Tracking,"Implements extraction and display of ontology version metadata.
+
+### Subtasks
+- [ ] 5.2.1.1 Extract owl:versionIRI metadata
+- [ ] 5.2.1.2 Display ontology version in UI
+- [ ] 5.2.1.3 Preserve historical version metadata
+","phase:5-export-deployment,section:5.2-versioning,type:feature","Phase 5 – Ontology Export, CI/CD & Production Deployment"
+Task 5.2.2 — Documentation Release Tagging,"Implements documentation build tagging by ontology version.
+
+### Subtasks
+- [ ] 5.2.2.1 Tag documentation builds by ontology version
+- [ ] 5.2.2.2 Generate release manifest
+","phase:5-export-deployment,section:5.2-versioning,type:feature","Phase 5 – Ontology Export, CI/CD & Production Deployment"
+Task 5.2.99 — Unit Tests: Versioning,Unit tests for version extraction and display.,"phase:5-export-deployment,section:5.2-versioning,type:testing","Phase 5 – Ontology Export, CI/CD & Production Deployment"
+Task 5.3.1 — Ontology Validation Pipeline,"Implements automated ontology validation in CI.
+
+### Subtasks
+- [ ] 5.3.1.1 Validate syntax of all TTL sources
+- [ ] 5.3.1.2 Validate import closure completeness
+- [ ] 5.3.1.3 Validate graph sanity (cycles, orphan classes)
+","phase:5-export-deployment,section:5.3-ci,type:feature,ontology:parsing","Phase 5 – Ontology Export, CI/CD & Production Deployment"
+Task 5.3.2 — Documentation Build Validation,"Validates documentation builds in CI.
+
+### Subtasks
+- [ ] 5.3.2.1 Run all unit tests
+- [ ] 5.3.2.2 Run all integration tests
+- [ ] 5.3.2.3 Validate UI build artifacts
+","phase:5-export-deployment,section:5.3-ci,type:feature","Phase 5 – Ontology Export, CI/CD & Production Deployment"
+Task 5.3.3 — CI Integration,"Implements GitHub Actions integration.
+
+### Subtasks
+- [ ] 5.3.3.1 GitHub Actions pipeline for test/build
+- [ ] 5.3.3.2 PR validation gating
+- [ ] 5.3.3.3 Automated artifact generation
+","phase:5-export-deployment,section:5.3-ci,type:feature","Phase 5 – Ontology Export, CI/CD & Production Deployment"
+Task 5.3.99 — Unit Tests: CI Validation,Unit tests verifying failure conditions block CI.,"phase:5-export-deployment,section:5.3-ci,type:testing","Phase 5 – Ontology Export, CI/CD & Production Deployment"
+Task 5.4.1 — Phoenix Production Release,"Builds and hardens Phoenix production release.
+
+### Subtasks
+- [ ] 5.4.1.1 Build MIX_ENV=prod release
+- [ ] 5.4.1.2 Configure runtime environment variables
+- [ ] 5.4.1.3 Harden Phoenix security settings
+","phase:5-export-deployment,section:5.4-deployment,type:feature","Phase 5 – Ontology Export, CI/CD & Production Deployment"
+Task 5.4.2 — Read-Only Public Hosting Mode,"Locks system into read-only production mode.
+
+### Subtasks
+- [ ] 5.4.2.1 Disable all write paths
+- [ ] 5.4.2.2 Lock ontology ingestion to runtime boot
+- [ ] 5.4.2.3 Prevent LiveView mutation operations
+","phase:5-export-deployment,section:5.4-deployment,type:feature","Phase 5 – Ontology Export, CI/CD & Production Deployment"
+Task 5.4.3 — Deployment Targets,"Implements cloud deployment targets and security.
+
+### Subtasks
+- [ ] 5.4.3.1 Deploy to Fly.io or container platform
+- [ ] 5.4.3.2 Configure HTTPS and security headers
+- [ ] 5.4.3.3 Enable observability and logs
+","phase:5-export-deployment,section:5.4-deployment,type:feature","Phase 5 – Ontology Export, CI/CD & Production Deployment"
+Task 5.4.99 — Unit Tests: Deployment Safety,Unit tests verifying production safety mechanisms.,"phase:5-export-deployment,section:5.4-deployment,type:testing","Phase 5 – Ontology Export, CI/CD & Production Deployment"
+Task 5.5.1 — Ontology Hot-Swap Support,"Implements controlled ontology reload support.
+
+### Subtasks
+- [ ] 5.5.1.1 Reload ontologies on restart
+- [ ] 5.5.1.2 Detect ontology schema drift
+","phase:5-export-deployment,section:5.5-maintenance,type:feature","Phase 5 – Ontology Export, CI/CD & Production Deployment"
+Task 5.5.2 — Deprecation & Change Tracking,"Tracks deprecated ontology entities.
+
+### Subtasks
+- [ ] 5.5.2.1 Detect owl:deprecated entities
+- [ ] 5.5.2.2 Render deprecation warnings in UI
+","phase:5-export-deployment,section:5.5-maintenance,type:feature","Phase 5 – Ontology Export, CI/CD & Production Deployment"
+Task 5.5.3 — Governance Hooks,"Implements governance and change export hooks.
+
+### Subtasks
+- [ ] 5.5.3.1 Export ontology change logs
+- [ ] 5.5.3.2 Support external review workflows
+","phase:5-export-deployment,section:5.5-maintenance,type:feature","Phase 5 – Ontology Export, CI/CD & Production Deployment"
+Task 5.5.99 — Unit Tests: Maintenance,Unit tests for deprecation tracking and change exports.,"phase:5-export-deployment,section:5.5-maintenance,type:testing","Phase 5 – Ontology Export, CI/CD & Production Deployment"
+Task 5.99.1 — Full End-to-End System Validation,"Full system E2E validation.
+
+### Subtasks
+- [ ] 5.99.1.1 Ingest ontology → build docs → deploy
+- [ ] 5.99.1.2 Verify all UI layers still function
+","phase:5-export-deployment,section:5.99-integration,type:testing","Phase 5 – Ontology Export, CI/CD & Production Deployment"
+Task 5.99.2 — Production Reliability Validation,"Production reliability and uptime tests.
+
+### Subtasks
+- [ ] 5.99.2.1 Multi-user concurrent browsing
+- [ ] 5.99.2.2 Long-running uptime validation
+","phase:5-export-deployment,section:5.99-integration,type:testing","Phase 5 – Ontology Export, CI/CD & Production Deployment"

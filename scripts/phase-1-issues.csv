@@ -1,0 +1,105 @@
+title,body,labels,milestone
+Task 1.1.1 — Ontology Source Loader,"Implements loading of root OWL/Turtle ontology files.
+
+### Subtasks
+- [ ] 1.1.1.1 Load TTL files
+- [ ] 1.1.1.2 Validate file accessibility
+- [ ] 1.1.1.3 Detect base ontology
+","phase:1-ontology-core,section:1.1-imports,type:feature,ontology:parsing",Phase 1 – Ontology Ingestion & Canonical Model
+Task 1.1.2 — owl:imports Resolution,"Implements recursive owl:imports resolution.
+
+### Subtasks
+- [ ] 1.1.2.1 Resolve direct imports
+- [ ] 1.1.2.2 Resolve cascading imports
+- [ ] 1.1.2.3 Track import provenance
+","phase:1-ontology-core,section:1.1-imports,type:feature,ontology:parsing",Phase 1 – Ontology Ingestion & Canonical Model
+Task 1.1.3 — Import Cycle Detection,"Prevents infinite ontology import loops.
+
+### Subtasks
+- [ ] 1.1.3.1 Detect cyclic imports
+- [ ] 1.1.3.2 Raise structured import errors
+","phase:1-ontology-core,section:1.1-imports,type:bug,ontology:parsing",Phase 1 – Ontology Ingestion & Canonical Model
+Task 1.1.99 — Unit Tests: Import Pipeline,Unit tests for ontology loading and import resolution.,"phase:1-ontology-core,section:1.1-imports,type:testing,ontology:parsing",Phase 1 – Ontology Ingestion & Canonical Model
+Task 1.2.1 — RDF Triple Normalization,"Normalizes raw RDF triples into canonical form.
+
+### Subtasks
+- [ ] 1.2.1.1 Expand CURIEs
+- [ ] 1.2.1.2 Normalize literals
+","phase:1-ontology-core,section:1.2-triples,type:feature,ontology:parsing",Phase 1 – Ontology Ingestion & Canonical Model
+Task 1.2.2 — Prefix Resolution,"Resolves namespace prefixes consistently.
+
+### Subtasks
+- [ ] 1.2.2.1 Extract prefix map
+- [ ] 1.2.2.2 Expand prefixed IRIs
+","phase:1-ontology-core,section:1.2-triples,type:feature,ontology:parsing",Phase 1 – Ontology Ingestion & Canonical Model
+Task 1.2.3 — Triple Provenance Tracking,"Tracks ontology source for each triple.
+
+### Subtasks
+- [ ] 1.2.3.1 Attach ontology origin
+- [ ] 1.2.3.2 Preserve merged provenance
+","phase:1-ontology-core,section:1.2-triples,type:feature,ontology:parsing",Phase 1 – Ontology Ingestion & Canonical Model
+Task 1.2.99 — Unit Tests: RDF Normalization,Unit tests for triple normalization and prefixes.,"phase:1-ontology-core,section:1.2-triples,type:testing,ontology:parsing",Phase 1 – Ontology Ingestion & Canonical Model
+Task 1.3.1 — Class Extraction,"Extracts all owl:Class entities.
+
+### Subtasks
+- [ ] 1.3.1.1 Parse owl:Class triples
+- [ ] 1.3.1.2 Attach labels and annotations
+","phase:1-ontology-core,section:1.3-entities,type:feature,ontology:parsing",Phase 1 – Ontology Ingestion & Canonical Model
+Task 1.3.2 — Object Property Extraction,"Extracts owl:ObjectProperty entities.
+
+### Subtasks
+- [ ] 1.3.2.1 Parse object properties
+- [ ] 1.3.2.2 Resolve domain and range
+","phase:1-ontology-core,section:1.3-entities,type:feature,ontology:parsing",Phase 1 – Ontology Ingestion & Canonical Model
+Task 1.3.3 — Data Property Extraction,"Extracts owl:DatatypeProperty entities.
+
+### Subtasks
+- [ ] 1.3.3.1 Parse data properties
+- [ ] 1.3.3.2 Attach XSD datatypes
+","phase:1-ontology-core,section:1.3-entities,type:feature,ontology:parsing",Phase 1 – Ontology Ingestion & Canonical Model
+Task 1.3.4 — Individual Extraction,"Extracts named individuals.
+
+### Subtasks
+- [ ] 1.3.4.1 Detect owl:NamedIndividual
+- [ ] 1.3.4.2 Attach property assertions
+","phase:1-ontology-core,section:1.3-entities,type:feature,ontology:parsing",Phase 1 – Ontology Ingestion & Canonical Model
+Task 1.3.99 — Unit Tests: OWL Entity Extraction,Unit tests for all OWL entity extraction.,"phase:1-ontology-core,section:1.3-entities,type:testing,ontology:parsing",Phase 1 – Ontology Ingestion & Canonical Model
+Task 1.4.1 — subClassOf Graph Builder,"Builds full rdfs:subClassOf hierarchy.
+
+### Subtasks
+- [ ] 1.4.1.1 Build directed class graph
+- [ ] 1.4.1.2 Compute root classes
+","phase:1-ontology-core,section:1.4-relations,type:feature,ontology:graph",Phase 1 – Ontology Ingestion & Canonical Model
+Task 1.4.2 — Domain & Range Resolution,"Resolves property domain and range.
+
+### Subtasks
+- [ ] 1.4.2.1 Resolve domain classes
+- [ ] 1.4.2.2 Resolve range classes
+","phase:1-ontology-core,section:1.4-relations,type:feature,ontology:graph",Phase 1 – Ontology Ingestion & Canonical Model
+Task 1.4.3 — Relation Indexing,"Indexes inbound and outbound relations.
+
+### Subtasks
+- [ ] 1.4.3.1 Build outgoing edges
+- [ ] 1.4.3.2 Build incoming edges
+","phase:1-ontology-core,section:1.4-relations,type:feature,ontology:graph",Phase 1 – Ontology Ingestion & Canonical Model
+Task 1.4.99 — Unit Tests: Relations & Hierarchy,Unit tests for class hierarchy and relations.,"phase:1-ontology-core,section:1.4-relations,type:testing,ontology:graph",Phase 1 – Ontology Ingestion & Canonical Model
+Task 1.5.1 — Canonical Query API (Classes),"Query API for classes.
+
+### Subtasks
+- [ ] 1.5.1.1 List all classes
+- [ ] 1.5.1.2 Fetch class by IRI
+","phase:1-ontology-core,section:1.5-api,type:feature,ontology:canonical-query",Phase 1 – Ontology Ingestion & Canonical Model
+Task 1.5.2 — Canonical Query API (Properties),"Query API for properties.
+
+### Subtasks
+- [ ] 1.5.2.1 List all properties
+- [ ] 1.5.2.2 Fetch property by IRI
+","phase:1-ontology-core,section:1.5-api,type:feature,ontology:canonical-query",Phase 1 – Ontology Ingestion & Canonical Model
+Task 1.5.3 — Canonical Query API (Individuals),"Query API for individuals.
+
+### Subtasks
+- [ ] 1.5.3.1 List all individuals
+- [ ] 1.5.3.2 Fetch individual by IRI
+","phase:1-ontology-core,section:1.5-api,type:feature,ontology:canonical-query",Phase 1 – Ontology Ingestion & Canonical Model
+Task 1.5.99 — Unit Tests: Canonical Query API,Unit tests for canonical query API.,"phase:1-ontology-core,section:1.5-api,type:testing,ontology:canonical-query",Phase 1 – Ontology Ingestion & Canonical Model
+Task 1.99.1 — Phase 1 Integration Validation,Full end-to-end validation of ontology ingestion and query API.,"phase:1-ontology-core,section:1.99-integration,type:testing,ontology:canonical-query",Phase 1 – Ontology Ingestion & Canonical Model
