@@ -26,9 +26,13 @@ preserved and import cycles must be safely detected and rejected.
 
 ### ✅ Task 1.1.1 --- Load Root Ontology Files
 
--   [ ] 1.1.1.1 Implement `.ttl` file reader\
--   [ ] 1.1.1.2 Validate file existence and readability\
--   [ ] 1.1.1.3 Register file metadata (path, base IRI, prefix map)
+-   [x] 1.1.1.1 Implement `.ttl` file reader\
+-   [x] 1.1.1.2 Validate file existence and readability\
+-   [x] 1.1.1.3 Register file metadata (path, base IRI, prefix map)
+
+**Status:** ✅ COMPLETED (2025-12-10)
+**Implementation:** `lib/onto_view/ontology/loader.ex`
+**Tests:** `test/onto_view/ontology/loader_test.exs` (16 tests, 87% coverage)
 
 ------------------------------------------------------------------------
 

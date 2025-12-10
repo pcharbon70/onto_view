@@ -1,0 +1,17 @@
+@prefix elixir: <http://example.org/elixir/core#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<http://example.org/elixir/core#> a owl:Ontology ;
+    rdfs:label "Elixir Core Ontology"@en ;
+    rdfs:comment "Core concepts for the Elixir programming language"@en .
+
+elixir:Module a owl:Class ;
+    rdfs:label "Module"@en ;
+    rdfs:comment "An Elixir module"@en .
+
+elixir:Function a owl:Class ;
+    rdfs:label "Function"@en ;
+    rdfs:comment "An Elixir function"@en ;
+    rdfs:subClassOf elixir:Module .

@@ -1,0 +1,111 @@
+title,body,labels,milestone
+Task 4.1.1 — Object Property Identity Panel,"Implements the core identity panel for object properties.
+
+### Subtasks
+- [ ] 4.1.1.1 Render property label
+- [ ] 4.1.1.2 Render canonical IRI
+- [ ] 4.1.1.3 Render ontology prefix
+- [ ] 4.1.1.4 Render property type indicators
+","phase:4-ux-accessibility,section:4.1-properties,type:feature,ontology:canonical-query","Phase 4 – Property Documentation, UX Enhancements & Accessibility"
+Task 4.1.2 — Domain & Range Panels,"Renders property domain and range panels.
+
+### Subtasks
+- [ ] 4.1.2.1 Render domain class links
+- [ ] 4.1.2.2 Render range class links
+- [ ] 4.1.2.3 Support multi-domain and multi-range
+","phase:4-ux-accessibility,section:4.1-properties,type:feature,ontology:canonical-query","Phase 4 – Property Documentation, UX Enhancements & Accessibility"
+Task 4.1.3 — OWL Property Characteristics,"Renders OWL property characteristics.
+
+### Subtasks
+- [ ] 4.1.3.1 Render owl:FunctionalProperty
+- [ ] 4.1.3.2 Render owl:InverseFunctionalProperty
+- [ ] 4.1.3.3 Render owl:TransitiveProperty
+- [ ] 4.1.3.4 Render owl:SymmetricProperty
+","phase:4-ux-accessibility,section:4.1-properties,type:feature,ontology:canonical-query","Phase 4 – Property Documentation, UX Enhancements & Accessibility"
+Task 4.1.99 — Unit Tests: Object Property Views,Unit tests for object property documentation views.,"phase:4-ux-accessibility,section:4.1-properties,type:testing,ontology:canonical-query","Phase 4 – Property Documentation, UX Enhancements & Accessibility"
+Task 4.2.1 — Datatype Range Rendering,"Renders XSD datatype ranges for data properties.
+
+### Subtasks
+- [ ] 4.2.1.1 Render XSD datatype IRIs
+- [ ] 4.2.1.2 Render human-readable datatype labels
+","phase:4-ux-accessibility,section:4.2-datatypes,type:feature,ontology:canonical-query","Phase 4 – Property Documentation, UX Enhancements & Accessibility"
+Task 4.2.2 — Cardinality & Restriction Support,"Renders OWL cardinality and restriction constraints.
+
+### Subtasks
+- [ ] 4.2.2.1 Render owl:minCardinality
+- [ ] 4.2.2.2 Render owl:maxCardinality
+- [ ] 4.2.2.3 Render owl:allValuesFrom
+","phase:4-ux-accessibility,section:4.2-datatypes,type:feature,ontology:canonical-query","Phase 4 – Property Documentation, UX Enhancements & Accessibility"
+Task 4.2.99 — Unit Tests: Data Property Constraints,Unit tests for datatype ranges and cardinality rendering.,"phase:4-ux-accessibility,section:4.2-datatypes,type:testing,ontology:canonical-query","Phase 4 – Property Documentation, UX Enhancements & Accessibility"
+Task 4.3.1 — Individual Identity Panel,"Renders the identity panel for named individuals.
+
+### Subtasks
+- [ ] 4.3.1.1 Render individual label
+- [ ] 4.3.1.2 Render canonical IRI
+- [ ] 4.3.1.3 Render ontology prefix
+","phase:4-ux-accessibility,section:4.3-individuals,type:feature,ontology:canonical-query","Phase 4 – Property Documentation, UX Enhancements & Accessibility"
+Task 4.3.2 — Class Membership Panel,"Renders class memberships for individuals.
+
+### Subtasks
+- [ ] 4.3.2.1 Render asserted class memberships
+- [ ] 4.3.2.2 Render inferred class memberships
+","phase:4-ux-accessibility,section:4.3-individuals,type:feature,ontology:canonical-query","Phase 4 – Property Documentation, UX Enhancements & Accessibility"
+Task 4.3.3 — Attached Data Value Panel,"Renders literal data properties for individuals.
+
+### Subtasks
+- [ ] 4.3.3.1 Render associated data properties
+- [ ] 4.3.3.2 Render literal values
+","phase:4-ux-accessibility,section:4.3-individuals,type:feature,ontology:canonical-query","Phase 4 – Property Documentation, UX Enhancements & Accessibility"
+Task 4.3.99 — Unit Tests: Individual Documentation,Unit tests for individual documentation views.,"phase:4-ux-accessibility,section:4.3-individuals,type:testing,ontology:canonical-query","Phase 4 – Property Documentation, UX Enhancements & Accessibility"
+Task 4.4.1 — Persistent Navigation State,"Implements persistent sidebar and selection state.
+
+### Subtasks
+- [ ] 4.4.1.1 Preserve sidebar expansion state
+- [ ] 4.4.1.2 Preserve selected class/property across reloads
+","phase:4-ux-accessibility,section:4.4-ux,type:feature","Phase 4 – Property Documentation, UX Enhancements & Accessibility"
+Task 4.4.2 — Breadcrumb Navigation,"Implements breadcrumb navigation across ontology entities.
+
+### Subtasks
+- [ ] 4.4.2.1 Render class hierarchy breadcrumb trail
+- [ ] 4.4.2.2 Render property navigation breadcrumbs
+","phase:4-ux-accessibility,section:4.4-ux,type:feature","Phase 4 – Property Documentation, UX Enhancements & Accessibility"
+Task 4.4.3 — Performance Optimizations,"Applies UI performance optimizations for large ontologies.
+
+### Subtasks
+- [ ] 4.4.3.1 Virtualize large class lists
+- [ ] 4.4.3.2 Lazy-load graph and heavy panels
+","phase:4-ux-accessibility,section:4.4-ux,type:feature","Phase 4 – Property Documentation, UX Enhancements & Accessibility"
+Task 4.4.99 — Unit Tests: UX Enhancements,Unit tests for navigation persistence and performance enhancements.,"phase:4-ux-accessibility,section:4.4-ux,type:testing","Phase 4 – Property Documentation, UX Enhancements & Accessibility"
+Task 4.5.1 — Keyboard Navigation,"Implements full keyboard navigation.
+
+### Subtasks
+- [ ] 4.5.1.1 Tab traversal through all UI components
+- [ ] 4.5.1.2 Arrow-key navigation for accordion tree
+","phase:4-ux-accessibility,section:4.5-accessibility,type:accessibility","Phase 4 – Property Documentation, UX Enhancements & Accessibility"
+Task 4.5.2 — ARIA Roles & Screen Reader Support,"Applies ARIA roles and screen reader labels.
+
+### Subtasks
+- [ ] 4.5.2.1 Apply ARIA roles to accordions
+- [ ] 4.5.2.2 Apply ARIA roles to graph controls
+- [ ] 4.5.2.3 Provide screen-reader labels
+","phase:4-ux-accessibility,section:4.5-accessibility,type:accessibility","Phase 4 – Property Documentation, UX Enhancements & Accessibility"
+Task 4.5.3 — Visual Accessibility,"Implements visual accessibility adjustments.
+
+### Subtasks
+- [ ] 4.5.3.1 Enforce color contrast ratios
+- [ ] 4.5.3.2 Provide focus outlines
+- [ ] 4.5.3.3 Support dark mode
+","phase:4-ux-accessibility,section:4.5-accessibility,type:accessibility","Phase 4 – Property Documentation, UX Enhancements & Accessibility"
+Task 4.5.99 — Unit Tests: Accessibility,"Unit tests for keyboard navigation, screen reader support, and contrast.","phase:4-ux-accessibility,section:4.5-accessibility,type:testing","Phase 4 – Property Documentation, UX Enhancements & Accessibility"
+Task 4.99.1 — Property & Individual Navigation Validation,"Integration validation for property and individual navigation.
+
+### Subtasks
+- [ ] 4.99.1.1 Navigate from class to property to class
+- [ ] 4.99.1.2 Navigate from class to individual to class
+","phase:4-ux-accessibility,section:4.99-integration,type:testing","Phase 4 – Property Documentation, UX Enhancements & Accessibility"
+Task 4.99.2 — Accessibility Compliance Validation,"Integration validation for accessibility compliance.
+
+### Subtasks
+- [ ] 4.99.2.1 Full keyboard-only navigation test
+- [ ] 4.99.2.2 Screen reader reading order validation
+","phase:4-ux-accessibility,section:4.99-integration,type:testing","Phase 4 – Property Documentation, UX Enhancements & Accessibility"

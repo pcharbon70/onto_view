@@ -1,0 +1,135 @@
+title,body,labels,milestone
+Task 2.1.1 — Phoenix LiveView Mounting Structure,"Implements the root LiveView mounting structure.
+
+### Subtasks
+- [ ] 2.1.1.1 Create OntologyLive root LiveView
+- [ ] 2.1.1.2 Configure LiveView layout templates
+- [ ] 2.1.1.3 Implement shared assigns for ontology state
+","phase:2-textual-ui,section:2.1-routing,type:feature",Phase 2 – Phoenix LiveView Textual Documentation UI
+Task 2.1.2 — Documentation Routing Model,"Implements routing for ontology documentation.
+
+### Subtasks
+- [ ] 2.1.2.1 Implement /docs ontology landing route
+- [ ] 2.1.2.2 Implement /docs/classes/:id
+- [ ] 2.1.2.3 Implement /docs/properties/:id
+- [ ] 2.1.2.4 Implement /docs/individuals/:id
+","phase:2-textual-ui,section:2.1-routing,type:feature",Phase 2 – Phoenix LiveView Textual Documentation UI
+Task 2.1.3 — IRI ↔ URL Encoding Layer,"Implements encoding and decoding between IRIs and URLs.
+
+### Subtasks
+- [ ] 2.1.3.1 Encode IRIs into URL-safe IDs
+- [ ] 2.1.3.2 Decode URLs into canonical IRIs
+- [ ] 2.1.3.3 Validate malformed identifiers
+","phase:2-textual-ui,section:2.1-routing,type:feature",Phase 2 – Phoenix LiveView Textual Documentation UI
+Task 2.1.99 — Unit Tests: Routing & Mounting,Unit tests for LiveView routing and mounting.,"phase:2-textual-ui,section:2.1-routing,type:testing",Phase 2 – Phoenix LiveView Textual Documentation UI
+Task 2.2.1 — Hierarchical Class Tree Builder,"Builds the hierarchical class tree for navigation.
+
+### Subtasks
+- [ ] 2.2.1.1 Load subclass graph into tree structure
+- [ ] 2.2.1.2 Preserve multiple inheritance branches
+- [ ] 2.2.1.3 Detect and mark root classes
+","phase:2-textual-ui,section:2.2-accordion,type:feature",Phase 2 – Phoenix LiveView Textual Documentation UI
+Task 2.2.2 — Accordion Rendering Engine,"Renders the hierarchical accordion UI.
+
+### Subtasks
+- [ ] 2.2.2.1 Expand/collapse UI behavior
+- [ ] 2.2.2.2 Recursive nested accordion rendering
+- [ ] 2.2.2.3 Lazy expansion for large branches
+","phase:2-textual-ui,section:2.2-accordion,type:feature",Phase 2 – Phoenix LiveView Textual Documentation UI
+Task 2.2.3 — Alphabetical Fallback View,"Implements alphabetical browsing fallback.
+
+### Subtasks
+- [ ] 2.2.3.1 Alphabetical class index generation
+- [ ] 2.2.3.2 Toggle between hierarchy and alphabetical views
+","phase:2-textual-ui,section:2.2-accordion,type:feature",Phase 2 – Phoenix LiveView Textual Documentation UI
+Task 2.2.99 — Unit Tests: Accordion Explorer,Unit tests for accordion-based navigation.,"phase:2-textual-ui,section:2.2-accordion,type:testing",Phase 2 – Phoenix LiveView Textual Documentation UI
+Task 2.3.1 — Full-Text Search Index,"Implements a full-text index for ontology entities.
+
+### Subtasks
+- [ ] 2.3.1.1 Index class names
+- [ ] 2.3.1.2 Index labels
+- [ ] 2.3.1.3 Index comments and definitions
+","phase:2-textual-ui,section:2.3-search,type:feature",Phase 2 – Phoenix LiveView Textual Documentation UI
+Task 2.3.2 — Live Search Input Handling,"Implements real-time search input handling.
+
+### Subtasks
+- [ ] 2.3.2.1 Debounce user keystrokes
+- [ ] 2.3.2.2 Server-side search evaluation
+- [ ] 2.3.2.3 Live result updates via assigns
+","phase:2-textual-ui,section:2.3-search,type:feature",Phase 2 – Phoenix LiveView Textual Documentation UI
+Task 2.3.3 — Ontology-Origin Filters,"Implements filtering by ontology source.
+
+### Subtasks
+- [ ] 2.3.3.1 Filter by ontology source
+- [ ] 2.3.3.2 Multi-ontology intersection filtering
+","phase:2-textual-ui,section:2.3-search,type:feature",Phase 2 – Phoenix LiveView Textual Documentation UI
+Task 2.3.99 — Unit Tests: Search & Filtering,Unit tests for search and filtering.,"phase:2-textual-ui,section:2.3-search,type:testing",Phase 2 – Phoenix LiveView Textual Documentation UI
+Task 2.4.1 — Core Class Identity Rendering,"Renders the core identity panel for classes.
+
+### Subtasks
+- [ ] 2.4.1.1 Render class label
+- [ ] 2.4.1.2 Render canonical IRI
+- [ ] 2.4.1.3 Render ontology prefix
+- [ ] 2.4.1.4 Render class type indicators
+","phase:2-textual-ui,section:2.4-detail,type:feature",Phase 2 – Phoenix LiveView Textual Documentation UI
+Task 2.4.2 — Annotation & Description Panel,"Renders annotation and description metadata.
+
+### Subtasks
+- [ ] 2.4.2.1 Render rdfs:comment
+- [ ] 2.4.2.2 Render skos:definition
+- [ ] 2.4.2.3 Render multilingual annotations
+","phase:2-textual-ui,section:2.4-detail,type:feature",Phase 2 – Phoenix LiveView Textual Documentation UI
+Task 2.4.3 — Class Hierarchy View,"Renders superclass and subclass relationships.
+
+### Subtasks
+- [ ] 2.4.3.1 Render direct superclasses
+- [ ] 2.4.3.2 Render direct subclasses
+- [ ] 2.4.3.3 Enable hyperlink traversal
+","phase:2-textual-ui,section:2.4-detail,type:feature",Phase 2 – Phoenix LiveView Textual Documentation UI
+Task 2.4.4 — Property Relationship Panels,"Renders inbound and outbound property relationships.
+
+### Subtasks
+- [ ] 2.4.4.1 Render outbound object properties
+- [ ] 2.4.4.2 Render inbound object properties
+- [ ] 2.4.4.3 Render attached data properties
+","phase:2-textual-ui,section:2.4-detail,type:feature",Phase 2 – Phoenix LiveView Textual Documentation UI
+Task 2.4.5 — Individual Instance Panel,"Renders named individuals for a class.
+
+### Subtasks
+- [ ] 2.4.5.1 Render named individuals
+- [ ] 2.4.5.2 Link individuals to class detail view
+","phase:2-textual-ui,section:2.4-detail,type:feature",Phase 2 – Phoenix LiveView Textual Documentation UI
+Task 2.4.99 — Unit Tests: Class Detail View,Unit tests for class detail views.,"phase:2-textual-ui,section:2.4-detail,type:testing",Phase 2 – Phoenix LiveView Textual Documentation UI
+Task 2.5.1 — Property Documentation View,"Implements standalone property documentation view.
+
+### Subtasks
+- [ ] 2.5.1.1 Render property identity panel
+- [ ] 2.5.1.2 Render domain and range
+- [ ] 2.5.1.3 Render property characteristics
+","phase:2-textual-ui,section:2.5-entities,type:feature",Phase 2 – Phoenix LiveView Textual Documentation UI
+Task 2.5.2 — Individual Documentation View,"Implements standalone individual documentation view.
+
+### Subtasks
+- [ ] 2.5.2.1 Render individual identity
+- [ ] 2.5.2.2 Render class membership
+- [ ] 2.5.2.3 Render attached data values
+","phase:2-textual-ui,section:2.5-entities,type:feature",Phase 2 – Phoenix LiveView Textual Documentation UI
+Task 2.5.99 — Unit Tests: Property & Individual Views,Unit tests for property and individual views.,"phase:2-textual-ui,section:2.5-entities,type:testing",Phase 2 – Phoenix LiveView Textual Documentation UI
+Task 2.99.1 — Hierarchical Navigation Validation,"Integration tests for hierarchical navigation.
+
+### Subtasks
+- [ ] 2.99.1.1 Navigate from root class to leaf class
+- [ ] 2.99.1.2 Navigate from subclass to superclass
+","phase:2-textual-ui,section:2.99-integration,type:testing",Phase 2 – Phoenix LiveView Textual Documentation UI
+Task 2.99.2 — Hyperlink Traversal Validation,"Integration tests for hyperlink traversal.
+
+### Subtasks
+- [ ] 2.99.2.1 Traverse outbound property links
+- [ ] 2.99.2.2 Traverse inbound property links
+","phase:2-textual-ui,section:2.99-integration,type:testing",Phase 2 – Phoenix LiveView Textual Documentation UI
+Task 2.99.3 — Search & Deep-Link Validation,"Integration tests for search and deep links.
+
+### Subtasks
+- [ ] 2.99.3.1 Locate entities via search
+- [ ] 2.99.3.2 Open documentation via direct URL
+","phase:2-textual-ui,section:2.99-integration,type:testing",Phase 2 – Phoenix LiveView Textual Documentation UI

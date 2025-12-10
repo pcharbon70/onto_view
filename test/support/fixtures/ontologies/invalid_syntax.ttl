@@ -1,0 +1,5 @@
+@prefix elixir: <http://example.org/elixir/core#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+This is not valid Turtle syntax!
+elixir:InvalidClass
