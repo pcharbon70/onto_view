@@ -1,0 +1,11 @@
+@prefix : <http://example.org/diamond_root#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<http://example.org/diamond_root#> a owl:Ontology ;
+    rdfs:label "Diamond Root Ontology" ;
+    owl:imports <http://example.org/diamond_left#> ,
+                <http://example.org/diamond_right#> .
+
+:RootClass a owl:Class ;
+    rdfs:label "Root Class" .

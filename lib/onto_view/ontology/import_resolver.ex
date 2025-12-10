@@ -6,7 +6,11 @@ defmodule OntoView.Ontology.ImportResolver do
   recursive import resolution, building complete ontology dependency chains
   while preserving provenance information.
 
+  Implements cycle detection to identify and report circular import dependencies
+  with diagnostic traces showing the exact circular path.
+
   Part of Task 1.1.2 — Resolve `owl:imports` Recursively
+  Part of Task 1.1.3 — Import Cycle Detection
   """
 
   require Logger
@@ -48,6 +52,13 @@ defmodule OntoView.Ontology.ImportResolver do
           base_dir: Path.t()
         }
 
+  @type cycle_trace :: %{
+          cycle_detected_at: String.t(),
+          import_path: [String.t()],
+          cycle_length: non_neg_integer(),
+          human_readable: String.t()
+        }
+
   @doc """
   Loads an ontology with all its recursive imports.
 
@@ -62,7 +73,8 @@ defmodule OntoView.Ontology.ImportResolver do
   ## Returns
 
   - `{:ok, loaded_ontologies}` - All ontologies loaded with provenance
-  - `{:error, reason}` - Error during loading
+  - `{:error, {:circular_dependency, cycle_trace}}` - Circular import detected
+  - `{:error, reason}` - Other error during loading
 
   ## Examples
 
@@ -72,6 +84,14 @@ defmodule OntoView.Ontology.ImportResolver do
         ontologies: %{"http://example.org/root#" => %{...}},
         import_chain: %{root_iri: "http://example.org/root#", ...}
       }}
+
+      iex> ImportResolver.load_with_imports("priv/ontologies/circular.ttl")
+      {:error, {:circular_dependency, %{
+        cycle_detected_at: "http://example.org/A#",
+        import_path: ["http://example.org/A#", "http://example.org/B#", "http://example.org/A#"],
+        cycle_length: 2,
+        human_readable: "http://example.org/A# → http://example.org/B# → [CYCLE START] http://example.org/A#"
+      }}}
   """
   @spec load_with_imports(Path.t(), keyword()) ::
           {:ok, loaded_ontologies()} | {:error, term()}
@@ -79,10 +99,11 @@ defmodule OntoView.Ontology.ImportResolver do
     max_depth = Keyword.get(opts, :max_depth, 10)
     base_dir = Keyword.get(opts, :base_dir, Path.dirname(file_path))
     visited = MapSet.new()
+    path = []
 
     with {:ok, root} <- Loader.load_file(file_path, opts),
          {:ok, resolver} <- build_iri_resolver(base_dir, opts) do
-      load_recursively(root, resolver, visited, 0, max_depth, %{})
+      load_recursively(root, resolver, visited, 0, max_depth, %{}, nil, path)
     end
   end
 
@@ -109,11 +130,12 @@ defmodule OntoView.Ontology.ImportResolver do
 
   # Private helper functions
 
-  defp load_recursively(ontology, resolver, visited, depth, max_depth, acc, root_iri \\ nil) do
+  defp load_recursively(ontology, resolver, visited, depth, max_depth, acc, root_iri, path) do
     if depth > max_depth do
       {:error, {:max_depth_exceeded, max_depth}}
     else
       iri = ontology.base_iri
+      new_path = path ++ [iri]
       new_visited = MapSet.put(visited, iri)
 
       # Track root IRI (first ontology loaded)
@@ -126,57 +148,101 @@ defmodule OntoView.Ontology.ImportResolver do
       # Extract and process imports
       {:ok, import_iris} = extract_imports(ontology.graph)
 
-      # Filter out already visited IRIs
-      unvisited_imports =
-        import_iris
-        |> Enum.reject(&MapSet.member?(new_visited, &1))
+      # Task 1.1.3.1: Check for cycles in the import list BEFORE filtering
+      cycle_iris = Enum.filter(import_iris, &(&1 in new_path))
 
-      # Load imports recursively
-      case load_imports(
-             unvisited_imports,
-             resolver,
-             new_visited,
-             depth + 1,
-             max_depth,
-             new_acc,
-             actual_root_iri
-           ) do
-        {:ok, final_acc} ->
-          # Only build final result at root level (depth 0)
-          if depth == 0 do
-            build_final_result(final_acc, actual_root_iri)
-          else
-            {:ok, final_acc}
-          end
+      if cycle_iris != [] do
+        # Cycle detected - report the first one
+        [cycle_iri | _] = cycle_iris
+        trace = build_cycle_trace(new_path, cycle_iri)
+        Logger.error("Circular dependency detected: #{trace.human_readable}")
+        {:error, {:circular_dependency, trace}}
+      else
+        # Filter out already visited IRIs (for diamond pattern optimization)
+        unvisited_imports =
+          import_iris
+          |> Enum.reject(&MapSet.member?(new_visited, &1))
 
-        error ->
-          error
+        # Load imports recursively
+        case load_imports(
+               unvisited_imports,
+               resolver,
+               new_visited,
+               depth + 1,
+               max_depth,
+               new_acc,
+               actual_root_iri,
+               new_path
+             ) do
+          {:ok, final_acc} ->
+            # Only build final result at root level (depth 0)
+            if depth == 0 do
+              build_final_result(final_acc, actual_root_iri)
+            else
+              {:ok, final_acc}
+            end
+
+          error ->
+            error
+        end
       end
     end
   end
 
-  defp load_imports([], _resolver, _visited, _depth, _max_depth, acc, _root_iri) do
+  defp load_imports([], _resolver, _visited, _depth, _max_depth, acc, _root_iri, _path) do
     {:ok, acc}
   end
 
-  defp load_imports([import_iri | rest], resolver, visited, depth, max_depth, acc, root_iri) do
-    case resolve_and_load_import(import_iri, resolver, visited, depth, max_depth, acc, root_iri) do
+  defp load_imports([import_iri | rest], resolver, visited, depth, max_depth, acc, root_iri, path) do
+    case resolve_and_load_import(
+           import_iri,
+           resolver,
+           visited,
+           depth,
+           max_depth,
+           acc,
+           root_iri,
+           path
+         ) do
       {:ok, new_acc} ->
-        load_imports(rest, resolver, visited, depth, max_depth, new_acc, root_iri)
+        # Recursively process remaining imports
+        case load_imports(rest, resolver, visited, depth, max_depth, new_acc, root_iri, path) do
+          {:ok, final_acc} ->
+            {:ok, final_acc}
+
+          {:error, {:circular_dependency, _trace}} = full_error ->
+            full_error
+
+          other_error ->
+            other_error
+        end
+
+      {:error, {:circular_dependency, _trace}} = full_error ->
+        # Task 1.1.3.2: Abort load on cycle detection
+        full_error
 
       {:error, reason} ->
         Logger.warning("Failed to load import #{import_iri}: #{inspect(reason)}")
         # Continue with other imports
-        load_imports(rest, resolver, visited, depth, max_depth, acc, root_iri)
+        load_imports(rest, resolver, visited, depth, max_depth, acc, root_iri, path)
     end
   end
 
-  defp resolve_and_load_import(import_iri, resolver, visited, depth, max_depth, acc, root_iri) do
+  defp resolve_and_load_import(
+         import_iri,
+         resolver,
+         visited,
+         depth,
+         max_depth,
+         acc,
+         root_iri,
+         path
+       ) do
     case resolve_import_iri(import_iri, resolver) do
-      {:ok, path} ->
-        case Loader.load_file(path) do
+      {:ok, file_path} ->
+        case Loader.load_file(file_path) do
           {:ok, ontology} ->
-            load_recursively(ontology, resolver, visited, depth, max_depth, acc, root_iri)
+            load_recursively(ontology, resolver, visited, depth, max_depth, acc, root_iri, path)
 
           error ->
             error
@@ -351,5 +417,31 @@ defmodule OntoView.Ontology.ImportResolver do
     |> List.wrap()
     |> Enum.filter(&match?(%RDF.IRI{}, &1))
     |> Enum.map(&to_string/1)
+  end
+
+  # Task 1.1.3.3: Build diagnostic dependency trace
+  @spec build_cycle_trace([String.t()], String.t()) :: cycle_trace()
+  defp build_cycle_trace(path, iri) do
+    full_path = path ++ [iri]
+    cycle_start_index = Enum.find_index(path, &(&1 == iri))
+
+    %{
+      cycle_detected_at: iri,
+      import_path: full_path,
+      cycle_length: length(path) - cycle_start_index,
+      human_readable: format_cycle_trace(full_path, cycle_start_index)
+    }
+  end
+
+  @spec format_cycle_trace([String.t()], non_neg_integer()) :: String.t()
+  defp format_cycle_trace(path, cycle_start) do
+    path
+    |> Enum.with_index()
+    |> Enum.map(fn {iri, idx} ->
+      marker = if idx == cycle_start, do: "[CYCLE START] ", else: ""
+      arrow = if idx > 0, do: " → ", else: ""
+      "#{arrow}#{marker}#{iri}"
+    end)
+    |> Enum.join("")
   end
 end

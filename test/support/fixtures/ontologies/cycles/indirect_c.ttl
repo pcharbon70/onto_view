@@ -1,0 +1,10 @@
+@prefix : <http://example.org/indirect_c#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<http://example.org/indirect_c#> a owl:Ontology ;
+    rdfs:label "Indirect Cycle C Ontology" ;
+    owl:imports <http://example.org/indirect_a#> .
+
+:ClassC a owl:Class ;
+    rdfs:label "Indirect Class C" .

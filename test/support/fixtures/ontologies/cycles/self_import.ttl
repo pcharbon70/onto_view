@@ -1,0 +1,11 @@
+@prefix : <http://example.org/self#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<http://example.org/self#> a owl:Ontology ;
+    rdfs:label "Self-Importing Ontology" ;
+    owl:imports <http://example.org/self#> .
+
+:SelfClass a owl:Class ;
+    rdfs:label "Self Class" ;
+    rdfs:comment "A class that imports itself" .
