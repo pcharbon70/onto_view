@@ -63,10 +63,14 @@ preserved and import cycles must be safely detected and rejected.
 
 ### ✅ Task 1.1.99 --- Unit Tests: Ontology Import Resolution
 
--   [ ] 1.1.99.1 Loads a single ontology correctly\
--   [ ] 1.1.99.2 Resolves multi-level imports correctly\
--   [ ] 1.1.99.3 Detects circular imports reliably\
--   [ ] 1.1.99.4 Preserves per-ontology provenance correctly
+-   [x] 1.1.99.1 Loads a single ontology correctly\
+-   [x] 1.1.99.2 Resolves multi-level imports correctly\
+-   [x] 1.1.99.3 Detects circular imports reliably\
+-   [x] 1.1.99.4 Preserves per-ontology provenance correctly
+
+**Status:** ✅ COMPLETED (2025-12-10)
+**Implementation:** `test/onto_view/ontology/integration_test.exs`
+**Tests:** 61 total tests (20 new integration tests), 89.2% coverage
 
 ------------------------------------------------------------------------
 

@@ -1,0 +1,19 @@
+@prefix : <http://example.org/prov_child#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<http://example.org/prov_child#> a owl:Ontology ;
+    rdfs:label "Provenance Child Ontology" ;
+    rdfs:comment "Child ontology with exactly 15 triples for provenance testing" .
+
+:ChildClass a owl:Class ;
+    rdfs:label "Child Class" ;
+    rdfs:comment "Class defined in child ontology" .
+
+:ChildProperty a owl:ObjectProperty ;
+    rdfs:label "Child Property" ;
+    rdfs:domain :ChildClass ;
+    rdfs:range :ChildClass .
+
+:ChildIndividual a :ChildClass ;
+    rdfs:label "Child Individual" .

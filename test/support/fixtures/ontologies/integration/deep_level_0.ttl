@@ -1,0 +1,11 @@
+@prefix : <http://example.org/deep_level_0#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<http://example.org/deep_level_0#> a owl:Ontology ;
+    rdfs:label "Deep Level 0 Ontology (Root)" ;
+    rdfs:comment "Root of 5-level deep import chain for integration testing" ;
+    owl:imports <http://example.org/deep_level_1#> .
+
+:RootClass a owl:Class ;
+    rdfs:label "Root Class" .

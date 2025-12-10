@@ -1,0 +1,14 @@
+@prefix : <http://example.org/hub#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<http://example.org/hub#> a owl:Ontology ;
+    rdfs:label "Hub Ontology" ;
+    rdfs:comment "Imports multiple ontologies at the same level" ;
+    owl:imports <http://example.org/spoke_a#> ,
+                <http://example.org/spoke_b#> ,
+                <http://example.org/spoke_c#> .
+
+:HubClass a owl:Class ;
+    rdfs:label "Hub Class" ;
+    rdfs:comment "Central class in hub ontology" .
