@@ -10,6 +10,11 @@ config :onto_view, :ontology_loader,
   # Enable streaming for files larger than threshold (5MB)
   stream_threshold_bytes: 5_242_880,
 
+  # Import chain resource limits (DoS protection)
+  max_depth: 10,
+  max_total_imports: 100,
+  max_imports_per_ontology: 20,
+
   # Validation strictness
   # Warning only
   validate_ttl_extension: false,
