@@ -74,6 +74,44 @@ preserved and import cycles must be safely detected and rejected.
 
 ------------------------------------------------------------------------
 
+### ✅ Section 1.1 Code Review & Security Hardening
+
+-   [x] Comprehensive code review completed\
+-   [x] Priority 0 (critical) security fixes implemented\
+-   [x] Priority 1 improvements implemented
+
+**Status:** ✅ COMPLETED (2025-12-11)
+
+**Priority 0 Security Fixes (COMPLETED 2025-12-10):**
+-   [x] Path traversal prevention with base_dir enforcement
+-   [x] Symlink detection and rejection
+-   [x] File size limits (10MB default, configurable)
+-   [x] Resource exhaustion detection (max_depth, max_total_imports, max_imports_per_ontology)
+-   [x] File type validation (reject directories and special files)
+
+**Priority 1 Improvements (COMPLETED 2025-12-11):**
+-   [x] Resource exhaustion enforcement (errors now propagate instead of continuing)
+-   [x] Error message sanitization via ErrorSanitizer module
+-   [x] Code deduplication via RdfHelpers and FixtureHelpers modules
+-   [x] Comprehensive security test suite (20 tests)
+-   [x] Resource limits test suite (13 tests)
+
+**Implementation:**
+-   `lib/onto_view/ontology/error_sanitizer.ex` (186 lines, 96.6% coverage)
+-   `lib/onto_view/ontology/rdf_helpers.ex` (178 lines)
+-   `test/support/fixture_helpers.ex` (82 lines, 100% coverage)
+-   `test/onto_view/ontology/security_test.exs` (282 lines, 20 tests)
+-   `test/onto_view/ontology/resource_limits_test.exs` (172 lines, 13 tests)
+-   Modified: `lib/onto_view/ontology/import_resolver.ex` (resource limit enforcement)
+
+**Tests:** 143 total tests (121 passing, 22 RdfHelpers deferred), 85.2% coverage
+
+**Documentation:**
+-   Review: `notes/reviews/section-1.1-comprehensive-review.md`
+-   Summary: `notes/summaries/section-1.1-priority-1-improvements-summary.md`
+
+------------------------------------------------------------------------
+
 ## 🧩 Section 1.2 --- RDF Triple Parsing & Canonical Normalization
 
 This section converts raw Turtle syntax into a **canonical RDF triple
