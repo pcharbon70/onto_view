@@ -21,36 +21,85 @@ defmodule OntoView.Ontology.ImportResolver do
   @owl_ontology RDF.iri("http://www.w3.org/2002/07/owl#Ontology")
   @owl_imports RDF.iri("http://www.w3.org/2002/07/owl#imports")
 
-  @type import_chain :: %{
-          root_iri: String.t(),
-          imports: [import_node()],
-          depth: non_neg_integer()
-        }
+  defmodule ImportNode do
+    @moduledoc """
+    Struct representing a single node in the import chain.
 
-  @type import_node :: %{
-          iri: String.t(),
-          path: Path.t(),
-          imports: [String.t()],
-          depth: non_neg_integer()
-        }
+    Provides better type safety and pattern matching compared to plain maps.
+    """
 
-  @type loaded_ontologies :: %{
-          dataset: RDF.Dataset.t(),
-          ontologies: %{String.t() => ontology_metadata()},
-          import_chain: import_chain()
-        }
+    @type t :: %__MODULE__{
+            iri: String.t(),
+            path: Path.t(),
+            imports: [String.t()],
+            depth: non_neg_integer()
+          }
 
-  @type ontology_metadata :: %{
-          iri: String.t(),
-          path: Path.t(),
-          base_iri: String.t(),
-          prefix_map: %{String.t() => String.t()},
-          imports: [String.t()],
-          graph: RDF.Graph.t(),
-          triple_count: non_neg_integer(),
-          loaded_at: DateTime.t(),
-          depth: non_neg_integer()
-        }
+    defstruct [:iri, :path, :imports, :depth]
+  end
+
+  defmodule OntologyMetadata do
+    @moduledoc """
+    Struct representing metadata for a loaded ontology.
+
+    Provides better type safety and pattern matching compared to plain maps.
+    """
+
+    @type t :: %__MODULE__{
+            iri: String.t(),
+            path: Path.t(),
+            base_iri: String.t(),
+            prefix_map: %{String.t() => String.t()},
+            imports: [String.t()],
+            graph: RDF.Graph.t(),
+            triple_count: non_neg_integer(),
+            loaded_at: DateTime.t(),
+            depth: non_neg_integer()
+          }
+
+    defstruct [:iri, :path, :base_iri, :prefix_map, :imports, :graph, :triple_count, :loaded_at, :depth]
+  end
+
+  defmodule ImportChain do
+    @moduledoc """
+    Struct representing the import dependency chain of an ontology.
+
+    Provides better type safety and pattern matching compared to plain maps.
+    """
+
+    alias OntoView.Ontology.ImportResolver.ImportNode
+
+    @type t :: %__MODULE__{
+            root_iri: String.t(),
+            imports: [ImportNode.t()],
+            depth: non_neg_integer()
+          }
+
+    defstruct [:root_iri, :imports, :depth]
+  end
+
+  defmodule LoadedOntologies do
+    @moduledoc """
+    Struct representing the complete result of loading an ontology with its imports.
+
+    Provides better type safety and pattern matching compared to plain maps.
+    """
+
+    alias OntoView.Ontology.ImportResolver.{ImportChain, OntologyMetadata}
+
+    @type t :: %__MODULE__{
+            dataset: RDF.Dataset.t(),
+            ontologies: %{String.t() => OntologyMetadata.t()},
+            import_chain: ImportChain.t()
+          }
+
+    defstruct [:dataset, :ontologies, :import_chain]
+  end
+
+  @type import_chain :: ImportChain.t()
+  @type import_node :: ImportNode.t()
+  @type loaded_ontologies :: LoadedOntologies.t()
+  @type ontology_metadata :: OntologyMetadata.t()
 
   @type iri_resolver :: %{
           mappings: %{String.t() => Path.t()},
@@ -449,7 +498,7 @@ defmodule OntoView.Ontology.ImportResolver do
   defp build_ontology_metadata(ontology, depth) do
     {:ok, imports} = extract_imports(ontology.graph)
 
-    %{
+    %OntologyMetadata{
       iri: ontology.base_iri,
       path: ontology.path,
       base_iri: ontology.base_iri,
@@ -467,7 +516,7 @@ defmodule OntoView.Ontology.ImportResolver do
     with {:ok, dataset} <- build_provenance_dataset(ontologies_map),
          {:ok, import_chain} <- build_import_chain(ontologies_map, root_iri) do
       {:ok,
-       %{
+       %LoadedOntologies{
          dataset: dataset,
          ontologies: ontologies_map,
          import_chain: import_chain
@@ -493,7 +542,7 @@ defmodule OntoView.Ontology.ImportResolver do
     imports =
       ontologies_map
       |> Enum.map(fn {iri, metadata} ->
-        %{
+        %ImportNode{
           iri: iri,
           path: metadata.path,
           imports: metadata.imports,
@@ -508,7 +557,7 @@ defmodule OntoView.Ontology.ImportResolver do
       |> Enum.max(fn -> 0 end)
 
     {:ok,
-     %{
+     %ImportChain{
        root_iri: root_iri,
        imports: imports,
        depth: max_depth
