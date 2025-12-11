@@ -1,0 +1,207 @@
+defmodule OntoView.Ontology.RdfHelpersTest do
+  use ExUnit.Case, async: true
+  doctest OntoView.Ontology.RdfHelpers
+
+  alias OntoView.Ontology.RdfHelpers
+
+  @owl_ontology RDF.iri("http://www.w3.org/2002/07/owl#Ontology")
+  @owl_class RDF.iri("http://www.w3.org/2002/07/owl#Class")
+  @rdfs_label RDF.iri("http://www.w3.org/2000/01/rdf-schema#label")
+
+  describe "has_type?/2" do
+    test "returns true when description has the specified type" do
+      description =
+        RDF.Description.new(RDF.iri("http://example.org/thing"))
+        |> RDF.Description.add(RDF.type(), @owl_ontology)
+
+      assert RdfHelpers.has_type?(description, @owl_ontology)
+    end
+
+    test "returns false when description does not have the specified type" do
+      description =
+        RDF.Description.new(RDF.iri("http://example.org/thing"))
+        |> RDF.Description.add(RDF.type(), @owl_class)
+
+      refute RdfHelpers.has_type?(description, @owl_ontology)
+    end
+
+    test "returns false when description has no types" do
+      description = RDF.Description.new(RDF.iri("http://example.org/thing"))
+
+      refute RdfHelpers.has_type?(description, @owl_ontology)
+    end
+
+    test "handles multiple types correctly" do
+      description =
+        RDF.Description.new(RDF.iri("http://example.org/thing"))
+        |> RDF.Description.add(RDF.type(), @owl_class)
+        |> RDF.Description.add(RDF.type(), @owl_ontology)
+
+      assert RdfHelpers.has_type?(description, @owl_ontology)
+      assert RdfHelpers.has_type?(description, @owl_class)
+    end
+  end
+
+  describe "get_types/1" do
+    test "returns empty list when no types" do
+      description = RDF.Description.new(RDF.iri("http://example.org/thing"))
+
+      assert RdfHelpers.get_types(description) == []
+    end
+
+    test "returns single type as list" do
+      description =
+        RDF.Description.new(RDF.iri("http://example.org/thing"))
+        |> RDF.Description.add(RDF.type(), @owl_ontology)
+
+      types = RdfHelpers.get_types(description)
+
+      assert is_list(types)
+      assert @owl_ontology in types
+      assert length(types) == 1
+    end
+
+    test "returns multiple types as list" do
+      description =
+        RDF.Description.new(RDF.iri("http://example.org/thing"))
+        |> RDF.Description.add(RDF.type(), @owl_class)
+        |> RDF.Description.add(RDF.type(), @owl_ontology)
+
+      types = RdfHelpers.get_types(description)
+
+      assert length(types) == 2
+      assert @owl_class in types
+      assert @owl_ontology in types
+    end
+  end
+
+  describe "get_single_value/3" do
+    test "returns the value when property exists" do
+      description =
+        RDF.Description.new(RDF.iri("http://example.org/thing"))
+        |> RDF.Description.add(@rdfs_label, "Test Label")
+
+      assert RdfHelpers.get_single_value(description, @rdfs_label) == "Test Label"
+    end
+
+    test "returns default when property does not exist" do
+      description = RDF.Description.new(RDF.iri("http://example.org/thing"))
+
+      assert RdfHelpers.get_single_value(description, @rdfs_label, "default") == "default"
+    end
+
+    test "returns nil as default when not specified" do
+      description = RDF.Description.new(RDF.iri("http://example.org/thing"))
+
+      assert RdfHelpers.get_single_value(description, @rdfs_label) == nil
+    end
+
+    test "returns first value when multiple values exist" do
+      description =
+        RDF.Description.new(RDF.iri("http://example.org/thing"))
+        |> RDF.Description.add(@rdfs_label, "First")
+        |> RDF.Description.add(@rdfs_label, "Second")
+
+      result = RdfHelpers.get_single_value(description, @rdfs_label)
+
+      assert result in ["First", "Second"]
+    end
+  end
+
+  describe "get_values/2" do
+    test "returns empty list when property does not exist" do
+      description = RDF.Description.new(RDF.iri("http://example.org/thing"))
+
+      assert RdfHelpers.get_values(description, @rdfs_label) == []
+    end
+
+    test "returns single value as list" do
+      description =
+        RDF.Description.new(RDF.iri("http://example.org/thing"))
+        |> RDF.Description.add(@rdfs_label, "Label")
+
+      values = RdfHelpers.get_values(description, @rdfs_label)
+
+      assert is_list(values)
+      assert "Label" in values
+      assert length(values) == 1
+    end
+
+    test "returns multiple values as list" do
+      description =
+        RDF.Description.new(RDF.iri("http://example.org/thing"))
+        |> RDF.Description.add(@rdfs_label, "Label 1")
+        |> RDF.Description.add(@rdfs_label, "Label 2")
+        |> RDF.Description.add(@rdfs_label, "Label 3")
+
+      values = RdfHelpers.get_values(description, @rdfs_label)
+
+      assert length(values) == 3
+      assert "Label 1" in values
+      assert "Label 2" in values
+      assert "Label 3" in values
+    end
+  end
+
+  describe "find_by_type/2" do
+    test "finds description with specified type" do
+      graph =
+        RDF.Graph.new()
+        |> RDF.Graph.add(RDF.iri("http://example.org/ont"), RDF.type(), @owl_ontology)
+        |> RDF.Graph.add(RDF.iri("http://example.org/class"), RDF.type(), @owl_class)
+
+      assert {:ok, description} = RdfHelpers.find_by_type(graph, @owl_ontology)
+      assert description.subject == RDF.iri("http://example.org/ont")
+    end
+
+    test "returns error when type not found" do
+      graph =
+        RDF.Graph.new()
+        |> RDF.Graph.add(RDF.iri("http://example.org/class"), RDF.type(), @owl_class)
+
+      assert {:error, :not_found} = RdfHelpers.find_by_type(graph, @owl_ontology)
+    end
+
+    test "returns error for empty graph" do
+      graph = RDF.Graph.new()
+
+      assert {:error, :not_found} = RdfHelpers.find_by_type(graph, @owl_ontology)
+    end
+
+    test "finds first matching description when multiple exist" do
+      graph =
+        RDF.Graph.new()
+        |> RDF.Graph.add(RDF.iri("http://example.org/ont1"), RDF.type(), @owl_ontology)
+        |> RDF.Graph.add(RDF.iri("http://example.org/ont2"), RDF.type(), @owl_ontology)
+
+      assert {:ok, description} = RdfHelpers.find_by_type(graph, @owl_ontology)
+      assert description.subject in [RDF.iri("http://example.org/ont1"), RDF.iri("http://example.org/ont2")]
+    end
+  end
+
+  describe "extract_iri/1" do
+    test "extracts IRI from description with IRI subject" do
+      description = RDF.Description.new(RDF.iri("http://example.org/thing"))
+
+      assert RdfHelpers.extract_iri(description) == "http://example.org/thing"
+    end
+
+    test "returns nil for blank node subject" do
+      description = RDF.Description.new(RDF.bnode("b1"))
+
+      assert RdfHelpers.extract_iri(description) == nil
+    end
+
+    test "handles complex IRIs with fragments" do
+      description = RDF.Description.new(RDF.iri("http://example.org/ontology#Thing"))
+
+      assert RdfHelpers.extract_iri(description) == "http://example.org/ontology#Thing"
+    end
+
+    test "handles IRIs with query parameters" do
+      description = RDF.Description.new(RDF.iri("http://example.org/thing?param=value"))
+
+      assert RdfHelpers.extract_iri(description) == "http://example.org/thing?param=value"
+    end
+  end
+end

@@ -100,11 +100,13 @@ defmodule OntoView.Ontology.ImportResolverTest do
     test "respects max_depth option" do
       path = Path.join(@imports_dir, "root.ttl")
 
-      # Set max_depth to 0, loads root but not imports
-      assert {:ok, result} = ImportResolver.load_with_imports(path, max_depth: 0)
-      # Should only have root, imports would be at depth 1+
-      assert map_size(result.ontologies) == 1
-      assert result.import_chain.depth == 0
+      # Set max_depth to 0, root can load at depth 0, but imports at depth 1 exceed limit
+      # Resource limit errors now propagate, so the entire load fails
+      assert {:error, {:max_depth_exceeded, 0}} = ImportResolver.load_with_imports(path, max_depth: 0)
+
+      # With max_depth: 10 (sufficient for this fixture), should succeed
+      assert {:ok, result} = ImportResolver.load_with_imports(path, max_depth: 10)
+      assert map_size(result.ontologies) > 1
     end
 
     test "resolves imports via convention-based file search" do
@@ -278,6 +280,42 @@ defmodule OntoView.Ontology.ImportResolverTest do
 
       # A → B → C → A forms a 3-ontology cycle
       assert trace.cycle_length == 3
+    end
+  end
+
+  describe "load_with_imports!/2 bang variant" do
+    test "returns result directly on success" do
+      path = Path.join(@imports_dir, "root.ttl")
+
+      result = ImportResolver.load_with_imports!(path)
+
+      # Should return the loaded_ontologies map directly (not wrapped in {:ok, ...})
+      assert is_map(result)
+      assert Map.has_key?(result, :dataset)
+      assert Map.has_key?(result, :ontologies)
+      assert Map.has_key?(result, :import_chain)
+    end
+
+    test "raises RuntimeError on file not found" do
+      assert_raise RuntimeError, fn ->
+        ImportResolver.load_with_imports!("nonexistent.ttl")
+      end
+    end
+
+    test "raises RuntimeError on circular dependency" do
+      path = Path.join(@cycles_dir, "cycle_a.ttl")
+
+      assert_raise RuntimeError, fn ->
+        ImportResolver.load_with_imports!(path)
+      end
+    end
+
+    test "raises RuntimeError on max depth exceeded" do
+      path = Path.join(@imports_dir, "root.ttl")
+
+      assert_raise RuntimeError, fn ->
+        ImportResolver.load_with_imports!(path, max_depth: 0)
+      end
     end
   end
 end

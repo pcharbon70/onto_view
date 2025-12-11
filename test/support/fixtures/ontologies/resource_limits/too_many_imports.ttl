@@ -1,0 +1,27 @@
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<http://example.org/too_many_imports#> a owl:Ontology ;
+    rdfs:label "Ontology with too many imports" ;
+    rdfs:comment "Test ontology that exceeds max_imports_per_ontology limit" ;
+    owl:imports <http://example.org/import1#> ;
+    owl:imports <http://example.org/import2#> ;
+    owl:imports <http://example.org/import3#> ;
+    owl:imports <http://example.org/import4#> ;
+    owl:imports <http://example.org/import5#> ;
+    owl:imports <http://example.org/import6#> ;
+    owl:imports <http://example.org/import7#> ;
+    owl:imports <http://example.org/import8#> ;
+    owl:imports <http://example.org/import9#> ;
+    owl:imports <http://example.org/import10#> ;
+    owl:imports <http://example.org/import11#> ;
+    owl:imports <http://example.org/import12#> ;
+    owl:imports <http://example.org/import13#> ;
+    owl:imports <http://example.org/import14#> ;
+    owl:imports <http://example.org/import15#> ;
+    owl:imports <http://example.org/import16#> ;
+    owl:imports <http://example.org/import17#> ;
+    owl:imports <http://example.org/import18#> ;
+    owl:imports <http://example.org/import19#> ;
+    owl:imports <http://example.org/import20#> ;
+    owl:imports <http://example.org/import21#> .
