@@ -15,19 +15,27 @@ defmodule OntoView.Ontology.Loader do
   # Common OWL/RDF IRIs as module attributes (optimization: avoids runtime creation)
   @owl_ontology RDF.iri("http://www.w3.org/2002/07/owl#Ontology")
 
-  @type file_path :: String.t() | Path.t()
-  @type load_result :: {:ok, loaded_ontology()} | {:error, error_reason()}
+  defmodule LoadedOntology do
+    @moduledoc """
+    Struct representing a successfully loaded ontology file.
 
-  @typedoc """
-  Represents a successfully loaded ontology file.
-  """
-  @type loaded_ontology :: %{
-          path: Path.t(),
-          base_iri: String.t() | nil,
-          prefix_map: %{String.t() => String.t()},
-          graph: RDF.Graph.t(),
-          loaded_at: DateTime.t()
-        }
+    Provides better type safety and pattern matching compared to plain maps.
+    """
+
+    @type t :: %__MODULE__{
+            path: Path.t(),
+            base_iri: String.t() | nil,
+            prefix_map: %{String.t() => String.t()},
+            graph: RDF.Graph.t(),
+            loaded_at: DateTime.t()
+          }
+
+    defstruct [:path, :base_iri, :prefix_map, :graph, :loaded_at]
+  end
+
+  @type file_path :: String.t() | Path.t()
+  @type loaded_ontology :: LoadedOntology.t()
+  @type load_result :: {:ok, loaded_ontology()} | {:error, error_reason()}
 
   @typedoc """
   Error reasons for failed ontology loads.
@@ -74,7 +82,7 @@ defmodule OntoView.Ontology.Loader do
     with {:ok, absolute_path} <- validate_file_path(file_path),
          {:ok, graph} <- parse_turtle_file(absolute_path, opts),
          {:ok, metadata} <- extract_metadata(graph, absolute_path, opts) do
-      result = %{
+      result = %LoadedOntology{
         path: absolute_path,
         base_iri: metadata.base_iri,
         prefix_map: metadata.prefix_map,
@@ -244,20 +252,14 @@ defmodule OntoView.Ontology.Loader do
     end)
   end
 
-  defp extract_prefix_map(graph) do
+  defp extract_prefix_map(%RDF.Graph{prefixes: prefixes}) do
     # Extract prefix declarations from graph metadata
     # RDF.ex stores these automatically when parsing Turtle
 
-    case graph do
-      %RDF.Graph{prefixes: prefixes} when is_map(prefixes) ->
-        prefixes
-        |> Map.new(fn {prefix, iri} ->
-          {to_string(prefix), to_string(iri)}
-        end)
-
-      _ ->
-        %{}
-    end
+    prefixes
+    |> Map.new(fn {prefix, iri} ->
+      {to_string(prefix), to_string(iri)}
+    end)
   end
 
   defp generate_default_base_iri do

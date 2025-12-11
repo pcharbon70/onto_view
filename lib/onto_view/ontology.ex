@@ -28,4 +28,11 @@ defmodule OntoView.Ontology do
   See `OntoView.Ontology.ImportResolver.load_with_imports/2` for details.
   """
   defdelegate load_with_imports(path, opts \\ []), to: ImportResolver
+
+  @doc """
+  Loads an ontology with all its recursive imports, raising on error.
+
+  See `OntoView.Ontology.ImportResolver.load_with_imports!/2` for details.
+  """
+  defdelegate load_with_imports!(path, opts \\ []), to: ImportResolver
 end
