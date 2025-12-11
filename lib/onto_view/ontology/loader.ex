@@ -12,6 +12,9 @@ defmodule OntoView.Ontology.Loader do
 
   require Logger
 
+  # Common OWL/RDF IRIs as module attributes (optimization: avoids runtime creation)
+  @owl_ontology RDF.iri("http://www.w3.org/2002/07/owl#Ontology")
+
   @type file_path :: String.t() | Path.t()
   @type load_result :: {:ok, loaded_ontology()} | {:error, error_reason()}
 
@@ -111,7 +114,7 @@ defmodule OntoView.Ontology.Loader do
       not File.exists?(absolute_path) ->
         {:error, :file_not_found}
 
-      is_symlink?(absolute_path) ->
+      symlink?(absolute_path) ->
         Logger.warning("Symlink detected and rejected: #{absolute_path}")
         {:error, {:symlink_detected, "Symlinks are not allowed for security"}}
 
@@ -127,7 +130,7 @@ defmodule OntoView.Ontology.Loader do
     end
   end
 
-  defp is_symlink?(path) do
+  defp symlink?(path) do
     case File.lstat(path) do
       {:ok, %File.Stat{type: :symlink}} -> true
       _ -> false
@@ -214,19 +217,16 @@ defmodule OntoView.Ontology.Loader do
     # 2. owl:Ontology IRI from graph
     # 3. Default base IRI pattern
 
-    cond do
-      Keyword.has_key?(opts, :base_iri) ->
-        opts[:base_iri]
-
-      true ->
-        find_ontology_iri(graph) || generate_default_base_iri()
+    if Keyword.has_key?(opts, :base_iri) do
+      opts[:base_iri]
+    else
+      find_ontology_iri(graph) || generate_default_base_iri()
     end
   end
 
   defp find_ontology_iri(graph) do
     # Query for owl:Ontology declaration
     # SELECT ?ontology WHERE { ?ontology a owl:Ontology }
-    owl_ontology_iri = RDF.iri("http://www.w3.org/2002/07/owl#Ontology")
 
     graph
     |> RDF.Graph.descriptions()
@@ -234,7 +234,7 @@ defmodule OntoView.Ontology.Loader do
       types = RDF.Description.get(description, RDF.type(), [])
       types_list = if is_list(types), do: types, else: [types]
 
-      if owl_ontology_iri in types_list do
+      if @owl_ontology in types_list do
         case description.subject do
           %RDF.IRI{} = iri -> to_string(iri)
           %RDF.BlankNode{} -> nil
