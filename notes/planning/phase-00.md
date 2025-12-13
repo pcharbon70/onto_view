@@ -135,16 +135,69 @@ Key Design: Loading is expensive (file I/O, parsing, indexing), so it's deferred
 
 ------------------------------------------------------------------------
 
+### ✅ Task 0.2.4 — IRI Resolution & Redirection
+
+- [ ] 0.2.4.1 Implement `resolve_iri/1` to search all loaded sets for an IRI\
+- [ ] 0.2.4.2 Return set_id, version, and entity_type for found IRIs\
+- [ ] 0.2.4.3 Handle version selection for IRIs present in multiple sets\
+- [ ] 0.2.4.4 Build IRI → (set_id, version) index for O(1) lookups\
+- [ ] 0.2.4.5 Support cache invalidation when sets are loaded/unloaded
+
+**Implementation:**
+- Function: `OntologyHub.resolve_iri/1` in `lib/onto_view/ontology_hub.ex`
+- Use TripleStore subject indexes to search by IRI
+- Return format: `%{set_id: string, version: string, entity_type: :class | :property | :individual, iri: string}`
+- Cache IRI mappings in State struct for performance
+
+**Use Case:** Enables Linked Data dereferenceable IRIs where external
+ontology IRIs can redirect to OntoView documentation pages following
+W3C best practices for Semantic Web publishing.
+
+------------------------------------------------------------------------
+
+### ✅ Task 0.2.5 — Content Negotiation Endpoint
+
+- [ ] 0.2.5.1 Implement `/resolve` route accepting IRI query parameter\
+- [ ] 0.2.5.2 Support content negotiation via Accept headers\
+- [ ] 0.2.5.3 Return 303 See Other redirects for successful resolutions\
+- [ ] 0.2.5.4 Handle text/html → documentation view redirect\
+- [ ] 0.2.5.5 Handle text/turtle → TTL export redirect\
+- [ ] 0.2.5.6 Handle application/json → JSON metadata response
+
+**Implementation:**
+- Route: `GET /resolve?iri=<url-encoded-iri>` in `lib/onto_view_web/router.ex`
+- Controller: `lib/onto_view_web/controllers/resolve_controller.ex`
+- Call `OntologyHub.resolve_iri/1` for IRI lookup
+- Redirect to appropriate view based on Accept header and entity type
+
+**Example Flow:**
+```
+GET /resolve?iri=http://example.org/MyClass
+Accept: text/html
+→ 303 See Other
+Location: /sets/elixir/v1.17/docs/classes/<encoded-iri>
+```
+
+------------------------------------------------------------------------
+
 ### ✅ Task 0.2.99 — Unit Tests: Loading & Querying
 
 - [ ] 0.2.99.1 Load valid set successfully via get_set/3\
 - [ ] 0.2.99.2 Handle load failures gracefully (invalid TTL, missing file)\
 - [ ] 0.2.99.3 list_sets/0 returns accurate metadata\
 - [ ] 0.2.99.4 list_versions/1 shows loaded status correctly\
-- [ ] 0.2.99.5 reload_set/3 updates cached data
+- [ ] 0.2.99.5 reload_set/3 updates cached data\
+- [ ] 0.2.99.6 resolve_iri/1 finds IRIs in loaded sets\
+- [ ] 0.2.99.7 resolve_iri/1 returns nil for unknown IRIs\
+- [ ] 0.2.99.8 resolve_iri/1 selects latest version for multi-version IRIs\
+- [ ] 0.2.99.9 /resolve endpoint returns 303 redirects with correct headers\
+- [ ] 0.2.99.10 Content negotiation routes to correct target (HTML/TTL/JSON)
 
-**Tests:** `test/onto_view/ontology_hub_test.exs`
-**Coverage Target:** 90%+ for loading and query functions
+**Tests:**
+- `test/onto_view/ontology_hub_test.exs`
+- `test/onto_view_web/controllers/resolve_controller_test.exs`
+
+**Coverage Target:** 90%+ for loading, query, and resolution functions
 
 ------------------------------------------------------------------------
 
@@ -253,7 +306,8 @@ Key Design: SetResolver plug centralizes set loading logic, making it available 
 
 - [ ] 0.4.3.1 Define landing page and set browser routes\
 - [ ] 0.4.3.2 Define set+version scoped documentation routes (placeholder LiveViews)\
-- [ ] 0.4.3.3 Add SetResolver plug to browser pipeline
+- [ ] 0.4.3.3 Define IRI resolution endpoint for content negotiation\
+- [ ] 0.4.3.4 Add SetResolver plug to browser pipeline
 
 **Implementation:**
 - Update: `lib/onto_view_web/router.ex`
@@ -261,6 +315,7 @@ Key Design: SetResolver plug centralizes set loading logic, making it available 
   - `GET /` → Landing page
   - `GET /sets` → Set browser (list all)
   - `GET /sets/:set_id` → Version selector (list versions)
+  - `GET /resolve` → IRI resolution endpoint (Task 0.2.5)
   - `live /sets/:set_id/:version/docs` → Docs landing (placeholder for Phase 2)
 - Pipeline: Add `plug OntoViewWeb.Plugs.SetResolver` to `:browser`
 
@@ -298,12 +353,16 @@ Key Design: SetResolver plug centralizes set loading logic, making it available 
 - [ ] 0.4.99.1 Routes resolve correctly for valid set+version\
 - [ ] 0.4.99.2 SetResolver plug loads correct ontology into assigns\
 - [ ] 0.4.99.3 Invalid set redirects to /sets with error flash\
-- [ ] 0.4.99.4 Session remembers last-viewed set
+- [ ] 0.4.99.4 Session remembers last-viewed set\
+- [ ] 0.4.99.5 /resolve endpoint redirects known IRIs correctly\
+- [ ] 0.4.99.6 /resolve endpoint returns 404 for unknown IRIs\
+- [ ] 0.4.99.7 Content negotiation headers route to correct endpoints
 
 **Tests:**
 - `test/onto_view_web/plugs/set_resolver_test.exs`
 - `test/onto_view_web/controllers/set_controller_test.exs`
 - `test/onto_view_web/controllers/page_controller_test.exs`
+- `test/onto_view_web/controllers/resolve_controller_test.exs`
 - `test/onto_view_web/live/docs_live_test.exs`
 
 ------------------------------------------------------------------------
@@ -352,5 +411,19 @@ This section validates that the entire multi-ontology hub works end-to-end: conf
 - [ ] 0.99.4.4 GenServer remains operational after load failures
 
 **Tests:** `test/integration/error_handling_test.exs`
+
+------------------------------------------------------------------------
+
+### ✅ Task 0.99.5 — IRI Resolution & Linked Data Workflow
+
+- [ ] 0.99.5.1 Resolve IRI to documentation view via /resolve endpoint\
+- [ ] 0.99.5.2 Validate content negotiation redirects to correct format\
+- [ ] 0.99.5.3 Resolve IRIs across multiple loaded sets\
+- [ ] 0.99.5.4 Handle IRIs present in multiple versions (selects latest stable)
+
+**Tests:** `test/integration/iri_resolution_test.exs`
+
+**Coverage:** End-to-end validation of Linked Data dereferenceable IRIs
+following W3C best practices (HTTP 303 redirects, content negotiation).
 
 ------------------------------------------------------------------------
