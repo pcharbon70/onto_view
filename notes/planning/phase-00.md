@@ -97,17 +97,18 @@ Key Design: Loading is expensive (file I/O, parsing, indexing), so it's deferred
 
 ------------------------------------------------------------------------
 
-### ✅ Task 0.2.1 — Set Loading Pipeline
+### ✅ Task 0.2.1 — Set Loading Pipeline ✅ COMPLETED (2025-12-13)
 
-- [ ] 0.2.1.1 Implement `load_set_from_config/3` orchestrating the pipeline\
-- [ ] 0.2.1.2 Implement `load_ontology_files/1` calling ImportResolver\
-- [ ] 0.2.1.3 Implement `build_triple_store/1` calling TripleStore\
-- [ ] 0.2.1.4 Implement `compute_stats/2` for metadata
+- [x] 0.2.1.1 Implement `load_set_from_config/3` orchestrating the pipeline\
+- [x] 0.2.1.2 Implement `load_ontology_files/1` calling ImportResolver\
+- [x] 0.2.1.3 Implement `build_triple_store/1` calling TripleStore\
+- [x] 0.2.1.4 Implement `compute_stats/2` for metadata
 
 **Implementation:**
 - Private pipeline functions in `lib/onto_view/ontology_hub.ex`
 - Integration: `ImportResolver.load_with_imports/2`, `TripleStore.from_loaded_ontologies/1`
 - Error handling: Wrap Phase 1 errors with context
+- **Note**: Implemented as part of Task 0.1.1 (see summary for details)
 
 ------------------------------------------------------------------------
 
