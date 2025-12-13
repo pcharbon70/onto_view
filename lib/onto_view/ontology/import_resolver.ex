@@ -530,8 +530,14 @@ defmodule OntoView.Ontology.ImportResolver do
       ontologies_map
       |> Enum.reduce(RDF.Dataset.new(), fn {iri, metadata}, acc ->
         # Use cached graph from metadata (optimization: eliminates file reloading)
+        # Add all triples from the graph to the named graph in the dataset
         graph_name = RDF.iri(iri)
-        RDF.Dataset.add(acc, metadata.graph, graph_name: graph_name)
+
+        metadata.graph
+        |> RDF.Graph.triples()
+        |> Enum.reduce(acc, fn triple, dataset_acc ->
+          RDF.Dataset.add(dataset_acc, triple, graph: graph_name)
+        end)
       end)
 
     {:ok, dataset}

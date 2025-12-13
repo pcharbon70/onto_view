@@ -1,0 +1,76 @@
+@prefix ex: <http://example.org/blank#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://example.org/blank#> a owl:Ontology ;
+    rdfs:label "Blank Node Test Ontology"@en ;
+    rdfs:comment "Ontology for testing blank node handling in triple extraction"@en .
+
+ex:Person a owl:Class ;
+    rdfs:label "Person"@en ;
+    rdfs:comment "A person with contact information"@en .
+
+ex:Address a owl:Class ;
+    rdfs:label "Address"@en ;
+    rdfs:comment "A postal address"@en .
+
+ex:hasAddress a owl:ObjectProperty ;
+    rdfs:label "has address"@en ;
+    rdfs:domain ex:Person ;
+    rdfs:range ex:Address .
+
+ex:street a owl:DatatypeProperty ;
+    rdfs:label "street"@en ;
+    rdfs:domain ex:Address ;
+    rdfs:range xsd:string .
+
+ex:city a owl:DatatypeProperty ;
+    rdfs:label "city"@en ;
+    rdfs:domain ex:Address ;
+    rdfs:range xsd:string .
+
+ex:postalCode a owl:DatatypeProperty ;
+    rdfs:label "postal code"@en ;
+    rdfs:domain ex:Address ;
+    rdfs:range xsd:string .
+
+# Person with blank node address (test case 1)
+ex:JohnDoe a ex:Person ;
+    rdfs:label "John Doe"@en ;
+    ex:hasAddress [
+        a ex:Address ;
+        ex:street "123 Main St" ;
+        ex:city "Springfield" ;
+        ex:postalCode "12345"
+    ] .
+
+# Person with blank node address (test case 2)
+ex:JaneSmith a ex:Person ;
+    rdfs:label "Jane Smith"@en ;
+    ex:hasAddress [
+        a ex:Address ;
+        ex:street "456 Oak Ave" ;
+        ex:city "Riverside"
+    ] .
+
+# Nested blank nodes (test case 3)
+ex:Company a owl:Class ;
+    rdfs:label "Company"@en .
+
+ex:hasEmployee a owl:ObjectProperty ;
+    rdfs:label "has employee"@en ;
+    rdfs:domain ex:Company ;
+    rdfs:range ex:Person .
+
+ex:AcmeCorp a ex:Company ;
+    rdfs:label "ACME Corporation"@en ;
+    ex:hasEmployee [
+        a ex:Person ;
+        rdfs:label "Bob Johnson" ;
+        ex:hasAddress [
+            a ex:Address ;
+            ex:street "789 Elm St" ;
+            ex:city "Downtown"
+        ]
+    ] .
