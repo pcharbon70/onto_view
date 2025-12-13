@@ -122,10 +122,22 @@ the sole foundation for all OWL semantic extraction.
 
 ### ✅ Task 1.2.1 --- RDF Triple Parsing
 
--   [ ] 1.2.1.1 Parse `(subject, predicate, object)` triples\
--   [ ] 1.2.1.2 Normalize IRIs\
--   [ ] 1.2.1.3 Expand prefix mappings\
--   [ ] 1.2.1.4 Separate literals from IRIs
+-   [x] 1.2.1.1 Parse `(subject, predicate, object)` triples\
+-   [x] 1.2.1.2 Normalize IRIs\
+-   [x] 1.2.1.3 Expand prefix mappings\
+-   [x] 1.2.1.4 Separate literals from IRIs
+
+**Status:** ✅ COMPLETED (2025-12-13)
+**Implementation:**
+- `lib/onto_view/ontology/triple_store.ex` (TripleStore module)
+- `lib/onto_view/ontology/triple_store/triple.ex` (Triple struct)
+- `lib/onto_view/ontology.ex` (Added build_triple_store/1)
+**Tests:**
+- `test/onto_view/ontology/triple_test.exs` (26 tests)
+- `test/onto_view/ontology/triple_store_test.exs` (57 tests, 1 skipped)
+**Coverage:** 100% for new modules (all subtasks fully tested)
+**Fixtures:** `test/support/fixtures/ontologies/blank_nodes.ttl`
+**Bug Fix:** Fixed provenance tracking in ImportResolver.build_provenance_dataset/1
 
 ------------------------------------------------------------------------
 

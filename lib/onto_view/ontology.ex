@@ -6,7 +6,7 @@ defmodule OntoView.Ontology do
   OWL/RDF ontologies expressed in Turtle format.
   """
 
-  alias OntoView.Ontology.{Loader, ImportResolver}
+  alias OntoView.Ontology.{Loader, ImportResolver, TripleStore}
 
   @doc """
   Loads an ontology file from the filesystem.
@@ -35,4 +35,19 @@ defmodule OntoView.Ontology do
   See `OntoView.Ontology.ImportResolver.load_with_imports!/2` for details.
   """
   defdelegate load_with_imports!(path, opts \\ []), to: ImportResolver
+
+  @doc """
+  Builds a canonical triple store from loaded ontologies.
+
+  Extracts all RDF triples from the loaded ontology dataset and converts
+  them to a normalized, queryable format. This provides the foundation
+  for OWL entity extraction (Section 1.3).
+
+  See `OntoView.Ontology.TripleStore.from_loaded_ontologies/1` for details.
+
+  Part of Task 1.2.1 — RDF Triple Parsing
+  """
+  defdelegate build_triple_store(loaded_ontologies),
+    to: TripleStore,
+    as: :from_loaded_ontologies
 end
