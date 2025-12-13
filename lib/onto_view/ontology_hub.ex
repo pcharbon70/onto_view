@@ -457,7 +457,7 @@ defmodule OntoView.OntologyHub do
         case load_set(acc_state, set_id, version) do
           {:ok, _set, new_state} ->
             Logger.info("Auto-loaded #{set_id} #{version}")
-            new_state
+            State.record_load(new_state)
 
           {:error, reason} ->
             Logger.error("Failed to auto-load #{set_id} #{version}: #{inspect(reason)}")

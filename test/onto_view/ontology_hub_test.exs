@@ -121,6 +121,95 @@ defmodule OntoView.OntologyHubTest do
     end
   end
 
+  describe "Auto-load functionality (0.1.99.3)" do
+    test "auto-loads sets with auto_load: true after delay" do
+      config = [
+        [
+          set_id: "auto_set",
+          name: "Auto Load Set",
+          versions: [
+            [version: "v1", root_path: "test/support/fixtures/ontologies/valid_simple.ttl", default: true]
+          ],
+          auto_load: true,
+          priority: 1
+        ],
+        [
+          set_id: "manual_set",
+          name: "Manual Load Set",
+          versions: [
+            [version: "v1", root_path: "test/support/fixtures/ontologies/valid_simple.ttl", default: true]
+          ],
+          auto_load: false,
+          priority: 2
+        ]
+      ]
+
+      Application.put_env(:onto_view, :ontology_sets, config)
+
+      start_supervised!(OntologyHub)
+
+      # Wait for auto-load to complete (1 second delay + processing time)
+      Process.sleep(1500)
+
+      # Check stats - auto_set should be loaded
+      stats = OntologyHub.get_stats()
+      assert stats.loaded_count == 1
+      assert stats.load_count == 1
+    end
+
+    test "respects priority when auto-loading multiple sets" do
+      config = [
+        [
+          set_id: "high_priority",
+          name: "High Priority",
+          versions: [[version: "v1", root_path: "test/support/fixtures/ontologies/valid_simple.ttl", default: true]],
+          auto_load: true,
+          priority: 1
+        ],
+        [
+          set_id: "low_priority",
+          name: "Low Priority",
+          versions: [[version: "v1", root_path: "test/support/fixtures/ontologies/valid_simple.ttl", default: true]],
+          auto_load: true,
+          priority: 2
+        ]
+      ]
+
+      Application.put_env(:onto_view, :ontology_sets, config)
+
+      start_supervised!(OntologyHub)
+
+      # Wait for auto-load
+      Process.sleep(1500)
+
+      stats = OntologyHub.get_stats()
+      # Both should be loaded (cache limit default is 5)
+      assert stats.loaded_count == 2
+    end
+
+    test "does not auto-load sets with auto_load: false" do
+      config = [
+        [
+          set_id: "no_auto",
+          name: "No Auto Load",
+          versions: [[version: "v1", root_path: "test/support/fixtures/ontologies/valid_simple.ttl", default: true]],
+          auto_load: false
+        ]
+      ]
+
+      Application.put_env(:onto_view, :ontology_sets, config)
+
+      start_supervised!(OntologyHub)
+
+      # Wait for potential auto-load
+      Process.sleep(1500)
+
+      stats = OntologyHub.get_stats()
+      # Should not be loaded
+      assert stats.loaded_count == 0
+    end
+  end
+
   describe "Error handling (0.1.99.4)" do
     test "GenServer remains operational after query errors" do
       Application.put_env(:onto_view, :ontology_sets, [])

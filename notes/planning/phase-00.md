@@ -62,16 +62,18 @@ Key Design: Separate lightweight `SetConfiguration` (metadata) from heavyweight 
 
 ------------------------------------------------------------------------
 
-### ✅ Task 0.1.3 — GenServer Lifecycle Management
+### ✅ Task 0.1.3 — GenServer Lifecycle Management ✅ COMPLETED (2025-12-13)
 
-- [ ] 0.1.3.1 Implement `init/1` callback with config loading\
-- [ ] 0.1.3.2 Implement auto-load scheduling (1 second delay)\
-- [ ] 0.1.3.3 Implement `handle_info(:auto_load, state)` callback\
-- [ ] 0.1.3.4 Add graceful shutdown with `terminate/2`
+- [x] 0.1.3.1 Implement `init/1` callback with config loading\
+- [x] 0.1.3.2 Implement auto-load scheduling (1 second delay)\
+- [x] 0.1.3.3 Implement `handle_info(:auto_load, state)` callback\
+- [x] 0.1.3.4 Add graceful shutdown with `terminate/2`
 
 **Implementation:**
 - GenServer callbacks in `lib/onto_view/ontology_hub.ex`
 - Auto-load only default versions of sets with `auto_load: true`
+- **Enhancement**: Added `State.record_load/1` in auto-load handler
+- **Tests**: Added comprehensive auto-load tests (0.1.99.3)
 
 ------------------------------------------------------------------------
 
