@@ -25,6 +25,7 @@ defmodule OntoView.Ontology.TripleStore do
   - Task 1.2.1.2: Normalize IRIs (via Triple module)
   - Task 1.2.1.3: Expand prefix mappings (handled by RDF.ex during parsing)
   - Task 1.2.1.4: Separate literals from IRIs (via Triple module)
+  - Task 1.2.2: Blank node stabilization (via BlankNodeStabilizer module)
 
   ## Query Interface
 
@@ -40,6 +41,7 @@ defmodule OntoView.Ontology.TripleStore do
   """
 
   alias OntoView.Ontology.TripleStore.Triple
+  alias OntoView.Ontology.TripleStore.BlankNodeStabilizer
   alias OntoView.Ontology.ImportResolver.LoadedOntologies
 
   @type t :: %__MODULE__{
@@ -58,7 +60,8 @@ defmodule OntoView.Ontology.TripleStore do
 
   ## Task Coverage
 
-  Task 1.2.1.1: Parse (subject, predicate, object) triples
+  - Task 1.2.1.1: Parse (subject, predicate, object) triples
+  - Task 1.2.2: Blank node stabilization
 
   ## Parameters
 
@@ -79,12 +82,13 @@ defmodule OntoView.Ontology.TripleStore do
   """
   @spec from_loaded_ontologies(LoadedOntologies.t()) :: t()
   def from_loaded_ontologies(%LoadedOntologies{} = loaded) do
-    triples = extract_all_triples(loaded.dataset)
+    raw_triples = extract_all_triples(loaded.dataset)
+    stabilized_triples = BlankNodeStabilizer.stabilize(raw_triples)
     ontology_iris = MapSet.new(Map.keys(loaded.ontologies))
 
     %__MODULE__{
-      triples: triples,
-      count: length(triples),
+      triples: stabilized_triples,
+      count: length(stabilized_triples),
       ontologies: ontology_iris
     }
   end

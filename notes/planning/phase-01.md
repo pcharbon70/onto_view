@@ -143,9 +143,19 @@ the sole foundation for all OWL semantic extraction.
 
 ### ✅ Task 1.2.2 --- Blank Node Stabilization
 
--   [ ] 1.2.2.1 Detect blank nodes\
--   [ ] 1.2.2.2 Generate stable internal identifiers\
--   [ ] 1.2.2.3 Preserve blank node reference consistency
+-   [x] 1.2.2.1 Detect blank nodes\
+-   [x] 1.2.2.2 Generate stable internal identifiers\
+-   [x] 1.2.2.3 Preserve blank node reference consistency
+
+**Status:** ✅ COMPLETED (2025-12-13)
+**Implementation:**
+- `lib/onto_view/ontology/triple_store/blank_node_stabilizer.ex` (BlankNodeStabilizer module)
+- `lib/onto_view/ontology/triple_store.ex` (Integration with triple extraction)
+**Tests:**
+- `test/onto_view/ontology/blank_node_stabilizer_test.exs` (29 tests)
+**Coverage:** 100% for new module
+**Design:** Hybrid provenance + incremental counter strategy
+**Format:** `"{ontology_iri}_bn{counter}"` (e.g., "http://example.org/ont#_bn0001")
 
 ------------------------------------------------------------------------
 
