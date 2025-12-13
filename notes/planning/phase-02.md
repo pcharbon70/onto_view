@@ -12,6 +12,11 @@ canonical ontology model to users through a responsive, real-time,
 text-based UI that supports browsing, searching, filtering, and
 relationship navigation across all OWL entities.
 
+**Phase 0 Integration:** This phase builds on the multi-ontology hub
+architecture from Phase 0. All routes are scoped by set+version
+(`/sets/:set_id/:version/docs`), and LiveViews receive ontology data
+from `conn.assigns` populated by the SetResolver plug.
+
 ------------------------------------------------------------------------
 
 ## 🧩 Section 2.1 --- LiveView Application Shell & Routing
@@ -26,16 +31,17 @@ rules for ontology entities.
 
 -   [ ] 2.1.1.1 Create `OntologyLive` root LiveView\
 -   [ ] 2.1.1.2 Configure LiveView layout templates\
--   [ ] 2.1.1.3 Implement shared assigns for ontology state
+-   [ ] 2.1.1.3 Extract ontology data from `socket.assigns.ontology_set` (populated by SetResolver)\
+-   [ ] 2.1.1.4 Extract set_id and version from params for context-aware rendering
 
 ------------------------------------------------------------------------
 
 ### ✅ Task 2.1.2 --- Documentation Routing Model
 
--   [ ] 2.1.2.1 Implement `/docs` ontology landing route\
--   [ ] 2.1.2.2 Implement `/docs/classes/:id`\
--   [ ] 2.1.2.3 Implement `/docs/properties/:id`\
--   [ ] 2.1.2.4 Implement `/docs/individuals/:id`
+-   [ ] 2.1.2.1 Implement `/sets/:set_id/:version/docs` ontology landing route\
+-   [ ] 2.1.2.2 Implement `/sets/:set_id/:version/docs/classes/:id`\
+-   [ ] 2.1.2.3 Implement `/sets/:set_id/:version/docs/properties/:id`\
+-   [ ] 2.1.2.4 Implement `/sets/:set_id/:version/docs/individuals/:id`
 
 ------------------------------------------------------------------------
 
@@ -44,6 +50,23 @@ rules for ontology entities.
 -   [ ] 2.1.3.1 Encode IRIs into URL-safe IDs\
 -   [ ] 2.1.3.2 Decode URLs into canonical IRIs\
 -   [ ] 2.1.3.3 Validate malformed identifiers
+
+------------------------------------------------------------------------
+
+### ✅ Task 2.1.4 --- SetResolver Plug Integration
+
+-   [ ] 2.1.4.1 Integrate with SetResolver plug from Phase 0\
+-   [ ] 2.1.4.2 Access loaded ontology set from `conn.assigns.ontology_set`\
+-   [ ] 2.1.4.3 Access triple store from `conn.assigns.triple_store`\
+-   [ ] 2.1.4.4 Handle missing or invalid set+version combinations gracefully
+
+------------------------------------------------------------------------
+
+### ✅ Task 2.1.5 --- Set Selection UI Components
+
+-   [ ] 2.1.5.1 Render set+version context indicator in navigation\
+-   [ ] 2.1.5.2 Provide set switcher dropdown in header\
+-   [ ] 2.1.5.3 Link to set browser (`/sets`) from documentation views
 
 ------------------------------------------------------------------------
 
@@ -245,4 +268,12 @@ the textual ontology documentation system.
 
 -   [ ] 2.99.3.1 Locate entities via search\
 -   [ ] 2.99.3.2 Open documentation via direct URL
+
+------------------------------------------------------------------------
+
+### ✅ Task 2.99.4 --- Multi-Set Navigation Validation
+
+-   [ ] 2.99.4.1 Switch between different sets via set switcher\
+-   [ ] 2.99.4.2 Navigate between different versions of same set\
+-   [ ] 2.99.4.3 Verify set+version context persists across documentation views
 

@@ -12,6 +12,11 @@ representation, synchronized with LiveView state, enabling users to
 visually explore subclass hierarchies and semantic relationships in real
 time.
 
+**Phase 0 Integration:** Graph nodes must include set+version context
+for proper multi-set isolation. Node IDs use the format
+`"{set_id}_{version}_{encoded_iri}"` to ensure uniqueness across
+different ontology sets.
+
 ------------------------------------------------------------------------
 
 ## 🧩 Section 3.1 --- Graph Data Projection Engine
@@ -23,9 +28,9 @@ node and edge projections** suitable for real-time visualization.
 
 ### ✅ Task 3.1.1 --- Class Node Projection
 
--   [ ] 3.1.1.1 Project each class as a graph node\
--   [ ] 3.1.1.2 Assign stable node identifiers\
--   [ ] 3.1.1.3 Attach label and ontology-origin metadata
+-   [ ] 3.1.1.1 Project each class as a graph node from set-scoped triple store\
+-   [ ] 3.1.1.2 Assign stable node identifiers with set+version prefix: `"{set_id}_{version}_{encoded_iri}"`\
+-   [ ] 3.1.1.3 Attach label, ontology-origin, set_id, and version metadata
 
 ------------------------------------------------------------------------
 
@@ -72,7 +77,7 @@ within the browser using LiveView + JS hooks.
 
 -   [ ] 3.2.2.1 Configure force-directed layout\
 -   [ ] 3.2.2.2 Prevent label overlap\
--   [ ] 3.2.2.3 Apply ontology-origin color encoding
+-   [ ] 3.2.2.3 Apply set-aware color encoding (primary color = set, secondary = ontology)
 
 ------------------------------------------------------------------------
 
@@ -101,15 +106,16 @@ graph state and textual documentation views.
 
 ### ✅ Task 3.3.1 --- Sidebar → Graph Synchronization
 
--   [ ] 3.3.1.1 Selecting a class highlights its node\
+-   [ ] 3.3.1.1 Selecting a class highlights its node (using compound set+version+IRI node ID)\
 -   [ ] 3.3.1.2 Auto-zoom to selected node
 
 ------------------------------------------------------------------------
 
 ### ✅ Task 3.3.2 --- Graph → Documentation Synchronization
 
--   [ ] 3.3.2.1 Clicking a node opens class detail view\
--   [ ] 3.3.2.2 Trigger LiveView navigation event
+-   [ ] 3.3.2.1 Clicking a node opens class detail view with set+version context\
+-   [ ] 3.3.2.2 Trigger LiveView navigation event with set_id and version parameters\
+-   [ ] 3.3.2.3 Parse compound node IDs to extract set, version, and IRI components
 
 ------------------------------------------------------------------------
 
@@ -154,6 +160,38 @@ complexity.
 -   [ ] 3.4.99.1 Search filtering works\
 -   [ ] 3.4.99.2 Ontology layer filtering works\
 -   [ ] 3.4.99.3 Focus mode limits visible graph
+
+------------------------------------------------------------------------
+
+## 🧩 Section 3.5 --- Graph Route Integration
+
+This section integrates the graph visualization with the multi-ontology
+hub routing system, ensuring graphs are properly scoped to specific
+ontology sets and versions.
+
+------------------------------------------------------------------------
+
+### ✅ Task 3.5.1 --- Set-Scoped Graph Routes
+
+-   [ ] 3.5.1.1 Implement `/sets/:set_id/:version/graph` route for standalone graph view\
+-   [ ] 3.5.1.2 Load graph data from set-scoped triple store\
+-   [ ] 3.5.1.3 Pass set_id and version to graph JavaScript hooks
+
+------------------------------------------------------------------------
+
+### ✅ Task 3.5.2 --- Multi-Set Graph Context
+
+-   [ ] 3.5.2.1 Ensure graph state isolation between different sets\
+-   [ ] 3.5.2.2 Clear graph cache when switching sets\
+-   [ ] 3.5.2.3 Preserve graph layout state per set+version in session
+
+------------------------------------------------------------------------
+
+### ✅ Task 3.5.99 --- Unit Tests: Graph Routes
+
+-   [ ] 3.5.99.1 Graph route loads correctly for valid set+version\
+-   [ ] 3.5.99.2 Graph data is properly scoped to selected set\
+-   [ ] 3.5.99.3 Switching sets triggers graph reload
 
 ------------------------------------------------------------------------
 

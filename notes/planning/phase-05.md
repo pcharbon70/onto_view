@@ -12,6 +12,11 @@ capabilities, establish continuous integration and automated validation
 pipelines, and deploy a secure, scalable, read-only production
 environment suitable for public or internal scientific use.
 
+**Phase 0 Integration:** Export APIs must support per-set exports, CI
+pipelines must validate all configured ontology sets, and production
+deployment must include OntologyHub cache configuration for optimal
+performance.
+
 ------------------------------------------------------------------------
 
 ## 🧩 Section 5.1 --- Ontology Export & Distribution System
@@ -24,7 +29,7 @@ individual or merged ontology artifacts.
 
 ### ✅ Task 5.1.1 --- Raw Ontology Download
 
--   [ ] 5.1.1.1 Expose per-ontology Turtle (`.ttl`) download\
+-   [ ] 5.1.1.1 Expose per-set+version Turtle download at `/sets/:set_id/:version/export/ttl`\
 -   [ ] 5.1.1.2 Validate correct content-type headers\
 -   [ ] 5.1.1.3 Preserve original namespace prefixes
 
@@ -32,17 +37,17 @@ individual or merged ontology artifacts.
 
 ### ✅ Task 5.1.2 --- Merged Ontology Export
 
--   [ ] 5.1.2.1 Merge all imported ontologies into a single graph\
--   [ ] 5.1.2.2 Export merged ontology as Turtle\
+-   [ ] 5.1.2.1 Merge all imported ontologies within a set into a single graph\
+-   [ ] 5.1.2.2 Export merged ontology as Turtle at `/sets/:set_id/:version/export/merged.ttl`\
 -   [ ] 5.1.2.3 Maintain import provenance metadata
 
 ------------------------------------------------------------------------
 
 ### ✅ Task 5.1.3 --- JSON Export for Visualization APIs
 
--   [ ] 5.1.3.1 Export class graph as JSON\
--   [ ] 5.1.3.2 Export property relations as JSON\
--   [ ] 5.1.3.3 Export individuals as JSON
+-   [ ] 5.1.3.1 Export class graph as JSON at `/sets/:set_id/:version/export/classes.json`\
+-   [ ] 5.1.3.2 Export property relations as JSON at `/sets/:set_id/:version/export/properties.json`\
+-   [ ] 5.1.3.3 Export individuals as JSON at `/sets/:set_id/:version/export/individuals.json`
 
 ------------------------------------------------------------------------
 
@@ -93,17 +98,18 @@ and deployment readiness.
 
 ### ✅ Task 5.3.1 --- Ontology Validation Pipeline
 
--   [ ] 5.3.1.1 Validate syntax of all `.ttl` sources\
--   [ ] 5.3.1.2 Validate import closure completeness\
--   [ ] 5.3.1.3 Validate graph sanity (cycles, orphan classes)
+-   [ ] 5.3.1.1 Validate syntax of all `.ttl` sources across all configured sets\
+-   [ ] 5.3.1.2 Validate import closure completeness for each set+version\
+-   [ ] 5.3.1.3 Validate graph sanity (cycles, orphan classes) per set\
+-   [ ] 5.3.1.4 Use matrix testing strategy to validate all sets in parallel
 
 ------------------------------------------------------------------------
 
 ### ✅ Task 5.3.2 --- Documentation Build Validation
 
 -   [ ] 5.3.2.1 Run all unit tests\
--   [ ] 5.3.2.2 Run all integration tests\
--   [ ] 5.3.2.3 Validate UI build artifacts
+-   [ ] 5.3.2.2 Run all integration tests including multi-set scenarios\
+-   [ ] 5.3.2.3 Validate UI build artifacts for all configured sets
 
 ------------------------------------------------------------------------
 
@@ -132,15 +138,16 @@ deployment** of the ontology documentation platform.
 ### ✅ Task 5.4.1 --- Phoenix Production Release
 
 -   [ ] 5.4.1.1 Build `MIX_ENV=prod` release\
--   [ ] 5.4.1.2 Configure runtime environment variables\
--   [ ] 5.4.1.3 Harden Phoenix settings
+-   [ ] 5.4.1.2 Configure runtime environment variables including ontology set configuration\
+-   [ ] 5.4.1.3 Harden Phoenix settings\
+-   [ ] 5.4.1.4 Configure OntologyHub cache size and eviction strategy for production workloads
 
 ------------------------------------------------------------------------
 
 ### ✅ Task 5.4.2 --- Read-Only Public Hosting Mode
 
 -   [ ] 5.4.2.1 Disable all write paths\
--   [ ] 5.4.2.2 Lock ontology ingestion to runtime boot\
+-   [ ] 5.4.2.2 Lock ontology ingestion to OntologyHub boot (auto-load sets only)\
 -   [ ] 5.4.2.3 Prevent LiveView mutation operations
 
 ------------------------------------------------------------------------
@@ -164,14 +171,17 @@ deployment** of the ontology documentation platform.
 ## 🧩 Section 5.5 --- Long-Term Maintenance & Evolution Support
 
 This section prepares the platform for **long-term usage, incremental
-ontology evolution, and governance processes**.
+ontology evolution, and governance processes**. With Phase 0's
+multi-ontology hub, this includes managing multiple sets and versions
+over time.
 
 ------------------------------------------------------------------------
 
 ### ✅ Task 5.5.1 --- Ontology Hot-Swap Support
 
--   [ ] 5.5.1.1 Reload ontologies on restart\
--   [ ] 5.5.1.2 Detect ontology schema drift
+-   [ ] 5.5.1.1 Reload specific set+version combinations via OntologyHub.reload_set/3\
+-   [ ] 5.5.1.2 Detect ontology schema drift between versions\
+-   [ ] 5.5.1.3 Support hot-reload in development without full system restart
 
 ------------------------------------------------------------------------
 
@@ -184,8 +194,17 @@ ontology evolution, and governance processes**.
 
 ### ✅ Task 5.5.3 --- Governance Hooks
 
--   [ ] 5.5.3.1 Export ontology change logs\
+-   [ ] 5.5.3.1 Export ontology change logs per set+version\
 -   [ ] 5.5.3.2 Support external review workflows
+
+------------------------------------------------------------------------
+
+### ✅ Task 5.5.4 --- Multi-Set Version Management
+
+-   [ ] 5.5.4.1 Add new ontology sets to running system via configuration updates\
+-   [ ] 5.5.4.2 Add new versions to existing sets without disrupting loaded versions\
+-   [ ] 5.5.4.3 Deprecate and remove old versions gracefully\
+-   [ ] 5.5.4.4 Monitor OntologyHub cache metrics for optimization
 
 ------------------------------------------------------------------------
 

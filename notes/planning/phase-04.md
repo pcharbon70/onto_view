@@ -13,6 +13,10 @@ properties, data properties, and individuals are as discoverable and
 navigable as classes, while guaranteeing that the entire system is
 usable by keyboard-only and assistive-technology users.
 
+**Phase 0 Integration:** Navigation state, breadcrumbs, and ARIA labels
+must include set+version context to support multi-ontology exploration
+without losing user context when switching between sets.
+
 ------------------------------------------------------------------------
 
 ## 🧩 Section 4.1 --- Object & Data Property Documentation System
@@ -132,15 +136,17 @@ navigation clarity** for large ontologies.
 
 ### ✅ Task 4.4.1 --- Persistent Navigation State
 
--   [ ] 4.4.1.1 Preserve sidebar expansion state\
--   [ ] 4.4.1.2 Preserve selected class/property across reloads
+-   [ ] 4.4.1.1 Preserve sidebar expansion state per set+version in session storage\
+-   [ ] 4.4.1.2 Preserve selected class/property per set+version across reloads\
+-   [ ] 4.4.1.3 Use composite keys `{set_id, version, entity_iri}` for state tracking
 
 ------------------------------------------------------------------------
 
 ### ✅ Task 4.4.2 --- Breadcrumb Navigation
 
--   [ ] 4.4.2.1 Render class hierarchy breadcrumb trail\
--   [ ] 4.4.2.2 Render property navigation breadcrumbs
+-   [ ] 4.4.2.1 Render class hierarchy breadcrumb trail with set+version context\
+-   [ ] 4.4.2.2 Render property navigation breadcrumbs with set+version context\
+-   [ ] 4.4.2.3 Include set name and version in breadcrumb root
 
 ------------------------------------------------------------------------
 
@@ -177,7 +183,8 @@ This section ensures **full accessibility support** according to WCAG
 
 -   [ ] 4.5.2.1 Apply ARIA roles to accordions\
 -   [ ] 4.5.2.2 Apply ARIA roles to graph controls\
--   [ ] 4.5.2.3 Provide screen-reader labels
+-   [ ] 4.5.2.3 Provide screen-reader labels for all interactive elements\
+-   [ ] 4.5.2.4 Include set name and version in ARIA labels for context clarity
 
 ------------------------------------------------------------------------
 
