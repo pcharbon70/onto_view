@@ -161,9 +161,19 @@ the sole foundation for all OWL semantic extraction.
 
 ### ✅ Task 1.2.3 --- Triple Indexing Engine
 
--   [ ] 1.2.3.1 Index by subject\
--   [ ] 1.2.3.2 Index by predicate\
--   [ ] 1.2.3.3 Index by object
+-   [x] 1.2.3.1 Index by subject\
+-   [x] 1.2.3.2 Index by predicate\
+-   [x] 1.2.3.3 Index by object
+
+**Status:** ✅ COMPLETED (2025-12-13)
+**Implementation:**
+- `lib/onto_view/ontology/triple_store.ex` (Added indexes to struct, build functions, query functions)
+**Tests:**
+- `test/onto_view/ontology/triple_indexing_test.exs` (39 tests: 7 doctests + 32 unit tests)
+**Coverage:** 100% for index building and query functions
+**Design:** Map-based indexes using `Enum.group_by/2`
+**Performance:** O(log n) lookups vs O(n) linear scans
+**Query Functions:** `by_subject/2`, `by_predicate/2`, `by_object/2`
 
 ------------------------------------------------------------------------
 
