@@ -112,17 +112,18 @@ Key Design: Loading is expensive (file I/O, parsing, indexing), so it's deferred
 
 ------------------------------------------------------------------------
 
-### ✅ Task 0.2.2 — Public Query API
+### ✅ Task 0.2.2 — Public Query API ✅ COMPLETED (2025-12-13)
 
-- [ ] 0.2.2.1 Implement `get_set/3` with lazy loading and cache hit/miss\
-- [ ] 0.2.2.2 Implement `get_default_set/2` for convenience access\
-- [ ] 0.2.2.3 Implement `list_sets/0` returning summary metadata\
-- [ ] 0.2.2.4 Implement `list_versions/1` for a specific set
+- [x] 0.2.2.1 Implement `get_set/3` with lazy loading and cache hit/miss\
+- [x] 0.2.2.2 Implement `get_default_set/2` for convenience access\
+- [x] 0.2.2.3 Implement `list_sets/0` returning summary metadata\
+- [x] 0.2.2.4 Implement `list_versions/1` for a specific set
 
 **Implementation:**
 - Public functions in `lib/onto_view/ontology_hub.ex`
 - `handle_call` callbacks for synchronous query API
 - Comprehensive @doc with examples, @spec for all functions
+- **Note**: Implemented as part of Task 0.1.1 (see summary for details)
 
 ------------------------------------------------------------------------
 
