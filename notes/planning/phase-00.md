@@ -127,16 +127,17 @@ Key Design: Loading is expensive (file I/O, parsing, indexing), so it's deferred
 
 ------------------------------------------------------------------------
 
-### ✅ Task 0.2.3 — Cache Management Operations
+### ✅ Task 0.2.3 — Cache Management Operations ✅ COMPLETED (2025-12-13)
 
-- [ ] 0.2.3.1 Implement `reload_set/3` for hot-reloading (dev use case)\
-- [ ] 0.2.3.2 Implement `unload_set/2` to free memory\
-- [ ] 0.2.3.3 Implement `get_stats/0` for cache observability\
-- [ ] 0.2.3.4 Implement `configure_cache/2` for runtime tuning
+- [x] 0.2.3.1 Implement `reload_set/3` for hot-reloading (dev use case)\
+- [x] 0.2.3.2 Implement `unload_set/2` to free memory\
+- [x] 0.2.3.3 Implement `get_stats/0` for cache observability\
+- [x] 0.2.3.4 Implement `configure_cache/2` for runtime tuning
 
 **Implementation:**
 - Public functions in `lib/onto_view/ontology_hub.ex`
 - Stats include: loaded_count, cache_hit_rate, eviction_count
+- **Note**: Implemented as part of Task 0.1.1 (see summary for details)
 
 ------------------------------------------------------------------------
 
