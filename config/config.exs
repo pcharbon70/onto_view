@@ -45,6 +45,12 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
+# Configure MIME types for content negotiation
+config :mime, :types, %{
+  "text/turtle" => ["ttl"],
+  "application/rdf+xml" => ["rdf"]
+}
+
 config :onto_view, :ontology_loader,
   # Default directory for ontology files
   default_ontology_dir: "priv/ontologies",
