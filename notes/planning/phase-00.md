@@ -141,13 +141,13 @@ Key Design: Loading is expensive (file I/O, parsing, indexing), so it's deferred
 
 ------------------------------------------------------------------------
 
-### ✅ Task 0.2.4 — IRI Resolution & Redirection
+### ✅ Task 0.2.4 — IRI Resolution & Redirection ✅ COMPLETED (2025-12-15)
 
-- [ ] 0.2.4.1 Implement `resolve_iri/1` to search all loaded sets for an IRI\
-- [ ] 0.2.4.2 Return set_id, version, and entity_type for found IRIs\
-- [ ] 0.2.4.3 Handle version selection for IRIs present in multiple sets\
-- [ ] 0.2.4.4 Build IRI → (set_id, version) index for O(1) lookups\
-- [ ] 0.2.4.5 Support cache invalidation when sets are loaded/unloaded
+- [x] 0.2.4.1 Implement `resolve_iri/1` to search all loaded sets for an IRI\
+- [x] 0.2.4.2 Return set_id, version, and entity_type for found IRIs\
+- [x] 0.2.4.3 Handle version selection for IRIs present in multiple sets\
+- [x] 0.2.4.4 Build IRI → (set_id, version) index for O(1) lookups\
+- [x] 0.2.4.5 Support cache invalidation when sets are loaded/unloaded
 
 **Implementation:**
 - Function: `OntologyHub.resolve_iri/1` in `lib/onto_view/ontology_hub.ex`
