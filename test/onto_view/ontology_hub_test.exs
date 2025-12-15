@@ -452,4 +452,231 @@ defmodule OntoView.OntologyHubTest do
       assert result.version == "v2.0"
     end
   end
+
+  # Task 0.3.99 — Unit Tests: Cache Management
+  describe "Cache Management (0.3.99)" do
+    setup do
+      # Configure multiple test sets for cache testing
+      Application.put_env(:onto_view, :ontology_sets, [
+        [
+          set_id: "set_a",
+          name: "Set A",
+          versions: [[version: "v1.0", root_path: "test/support/fixtures/ontologies/valid_simple.ttl", default: true]],
+          auto_load: false,
+          priority: 1
+        ],
+        [
+          set_id: "set_b",
+          name: "Set B",
+          versions: [[version: "v1.0", root_path: "test/support/fixtures/ontologies/valid_simple.ttl", default: true]],
+          auto_load: false,
+          priority: 2
+        ],
+        [
+          set_id: "set_c",
+          name: "Set C",
+          versions: [[version: "v1.0", root_path: "test/support/fixtures/ontologies/valid_simple.ttl", default: true]],
+          auto_load: false,
+          priority: 3
+        ],
+        [
+          set_id: "set_d",
+          name: "Set D",
+          versions: [[version: "v1.0", root_path: "test/support/fixtures/ontologies/valid_simple.ttl", default: true]],
+          auto_load: false,
+          priority: 4
+        ],
+        [
+          set_id: "set_e",
+          name: "Set E",
+          versions: [[version: "v1.0", root_path: "test/support/fixtures/ontologies/valid_simple.ttl", default: true]],
+          auto_load: false,
+          priority: 5
+        ],
+        [
+          set_id: "set_f",
+          name: "Set F",
+          versions: [[version: "v1.0", root_path: "test/support/fixtures/ontologies/valid_simple.ttl", default: true]],
+          auto_load: false,
+          priority: 6
+        ]
+      ])
+
+      # Restart OntologyHub with default cache_limit (5)
+      :ok = Supervisor.terminate_child(OntoView.Supervisor, OntologyHub)
+      {:ok, _} = Supervisor.restart_child(OntoView.Supervisor, OntologyHub)
+
+      :ok
+    end
+
+    test "0.3.99.1 - LRU eviction works correctly (time-based)" do
+      # Default cache_limit is 5
+      # Load 5 sets to fill cache
+      {:ok, _} = OntologyHub.get_set("set_a", "v1.0")
+      Process.sleep(10)
+      {:ok, _} = OntologyHub.get_set("set_b", "v1.0")
+      Process.sleep(10)
+      {:ok, _} = OntologyHub.get_set("set_c", "v1.0")
+      Process.sleep(10)
+      {:ok, _} = OntologyHub.get_set("set_d", "v1.0")
+      Process.sleep(10)
+      {:ok, _} = OntologyHub.get_set("set_e", "v1.0")
+
+      stats = OntologyHub.get_stats()
+      assert stats.loaded_count == 5
+
+      # Load 6th set - should evict set_a (oldest last_accessed)
+      {:ok, _} = OntologyHub.get_set("set_f", "v1.0")
+
+      stats_after = OntologyHub.get_stats()
+      assert stats_after.loaded_count == 5
+      assert stats_after.eviction_count == 1
+
+      # Verify set_a was evicted (accessing it will reload)
+      initial_load_count = stats_after.load_count
+      {:ok, _} = OntologyHub.get_set("set_a", "v1.0")
+
+      stats_final = OntologyHub.get_stats()
+      # load_count should increase (cache miss)
+      assert stats_final.load_count == initial_load_count + 1
+    end
+
+    test "0.3.99.2 - LFU eviction works correctly (frequency-based)" do
+      # Configure OntologyHub with LFU strategy
+      Application.put_env(:onto_view, :ontology_hub_cache_strategy, :lfu)
+      Application.put_env(:onto_view, :ontology_hub_cache_limit, 3)
+
+      # Restart with LFU strategy
+      :ok = Supervisor.terminate_child(OntoView.Supervisor, OntologyHub)
+      {:ok, _} = Supervisor.restart_child(OntoView.Supervisor, OntologyHub)
+
+      # Load 3 sets to fill cache
+      {:ok, _} = OntologyHub.get_set("set_a", "v1.0")
+      {:ok, _} = OntologyHub.get_set("set_b", "v1.0")
+      {:ok, _} = OntologyHub.get_set("set_c", "v1.0")
+
+      # Access set_a and set_b multiple times to increase their frequency
+      {:ok, _} = OntologyHub.get_set("set_a", "v1.0")
+      {:ok, _} = OntologyHub.get_set("set_a", "v1.0")
+      {:ok, _} = OntologyHub.get_set("set_b", "v1.0")
+
+      # set_c has lowest access count (1), set_b has 2, set_a has 3
+
+      stats = OntologyHub.get_stats()
+      assert stats.loaded_count == 3
+
+      # Load 4th set - should evict set_c (lowest access_count)
+      {:ok, _} = OntologyHub.get_set("set_d", "v1.0")
+
+      stats_after = OntologyHub.get_stats()
+      assert stats_after.loaded_count == 3
+      assert stats_after.eviction_count == 1
+
+      # Verify set_c was evicted
+      initial_load_count = stats_after.load_count
+      {:ok, _} = OntologyHub.get_set("set_c", "v1.0")
+
+      stats_final = OntologyHub.get_stats()
+      assert stats_final.load_count == initial_load_count + 1
+
+      # Reset to default LRU for other tests
+      Application.delete_env(:onto_view, :ontology_hub_cache_strategy)
+      Application.delete_env(:onto_view, :ontology_hub_cache_limit)
+    end
+
+    test "0.3.99.3 - Cache metrics are accurate" do
+      # Initial stats
+      initial_stats = OntologyHub.get_stats()
+      assert initial_stats.cache_hit_count == 0
+      assert initial_stats.cache_miss_count == 0
+      assert initial_stats.load_count == 0
+      assert initial_stats.eviction_count == 0
+      assert initial_stats.cache_hit_rate == 0.0
+
+      # First load - cache miss
+      {:ok, _} = OntologyHub.get_set("set_a", "v1.0")
+
+      stats1 = OntologyHub.get_stats()
+      assert stats1.cache_miss_count == 1
+      assert stats1.load_count == 1
+      assert stats1.cache_hit_count == 0
+
+      # Second access - cache hit
+      {:ok, _} = OntologyHub.get_set("set_a", "v1.0")
+
+      stats2 = OntologyHub.get_stats()
+      assert stats2.cache_hit_count == 1
+      assert stats2.cache_miss_count == 1
+      assert stats2.load_count == 1
+      assert stats2.cache_hit_rate == 0.5
+
+      # Third access - another cache hit
+      {:ok, _} = OntologyHub.get_set("set_a", "v1.0")
+
+      stats3 = OntologyHub.get_stats()
+      assert stats3.cache_hit_count == 2
+      assert stats3.cache_miss_count == 1
+      # Cache hit rate should be ~0.67 (2 hits / 3 total accesses)
+      assert_in_delta stats3.cache_hit_rate, 0.67, 0.01
+
+      # Load 5 more sets to fill cache and trigger eviction
+      {:ok, _} = OntologyHub.get_set("set_b", "v1.0")
+      {:ok, _} = OntologyHub.get_set("set_c", "v1.0")
+      {:ok, _} = OntologyHub.get_set("set_d", "v1.0")
+      {:ok, _} = OntologyHub.get_set("set_e", "v1.0")
+      {:ok, _} = OntologyHub.get_set("set_f", "v1.0")
+
+      stats4 = OntologyHub.get_stats()
+      assert stats4.eviction_count == 1
+      assert stats4.loaded_count == 5
+    end
+
+    test "0.3.99.4 - Cache limit is enforced (never exceeds max)" do
+      # Default cache_limit is 5
+      # Load 10 sets sequentially
+      for set_id <- ["set_a", "set_b", "set_c", "set_d", "set_e", "set_f"] do
+        {:ok, _} = OntologyHub.get_set(set_id, "v1.0")
+
+        # Verify loaded_count never exceeds 5
+        stats = OntologyHub.get_stats()
+        assert stats.loaded_count <= 5
+      end
+
+      # Final check
+      final_stats = OntologyHub.get_stats()
+      assert final_stats.loaded_count == 5
+      assert final_stats.eviction_count == 1
+    end
+
+    test "0.3.99.5 - Concurrent access is safe (100+ parallel requests)" do
+      # Spawn 100 concurrent tasks accessing the same sets
+      tasks =
+        1..100
+        |> Enum.map(fn i ->
+          Task.async(fn ->
+            # Round-robin through sets
+            set_id = Enum.at(["set_a", "set_b", "set_c", "set_d", "set_e"], rem(i, 5))
+            OntologyHub.get_set(set_id, "v1.0")
+          end)
+        end)
+
+      # Await all tasks
+      results = Enum.map(tasks, &Task.await(&1, 10_000))
+
+      # All should succeed
+      assert Enum.all?(results, fn
+               {:ok, _set} -> true
+               _error -> false
+             end)
+
+      # Verify GenServer is still operational
+      stats = OntologyHub.get_stats()
+      assert stats.loaded_count <= 5
+      assert stats.loaded_count > 0
+      assert stats.cache_hit_count > 0
+
+      # Verify we can still query successfully
+      {:ok, _} = OntologyHub.get_set("set_a", "v1.0")
+    end
+  end
 end

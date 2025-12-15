@@ -278,7 +278,14 @@ defmodule OntoView.OntologyHub do
     # Load configurations from Application env
     case load_set_configurations() do
       {:ok, configs} ->
-        state = State.new(configs, opts)
+        # Merge Application config with opts (opts take precedence)
+        cache_opts = [
+          cache_strategy: Application.get_env(:onto_view, :ontology_hub_cache_strategy, :lru),
+          cache_limit: Application.get_env(:onto_view, :ontology_hub_cache_limit, 5)
+        ]
+        merged_opts = Keyword.merge(cache_opts, opts)
+
+        state = State.new(configs, merged_opts)
         Logger.info("Loaded #{map_size(state.configurations)} ontology set configurations")
 
         # Schedule auto-load for sets with auto_load: true
