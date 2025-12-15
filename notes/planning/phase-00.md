@@ -215,12 +215,12 @@ Key Design: Eviction is synchronous during load but rare in production. Metrics 
 
 ------------------------------------------------------------------------
 
-### ✅ Task 0.3.1 — LRU Eviction Strategy
+### ✅ Task 0.3.1 — LRU Eviction Strategy ✅ COMPLETED (2025-12-15)
 
-- [ ] 0.3.1.1 Implement `evict_lru/1` finding oldest last_accessed set\
-- [ ] 0.3.1.2 Track `last_accessed` timestamp on every cache hit\
-- [ ] 0.3.1.3 Update `access_log` for temporal tracking\
-- [ ] 0.3.1.4 Enforce cache limit in `add_to_cache/3` before insertion
+- [x] 0.3.1.1 Implement `evict_lru/1` finding oldest last_accessed set\
+- [x] 0.3.1.2 Track `last_accessed` timestamp on every cache hit\
+- [x] 0.3.1.3 Update `access_log` for temporal tracking\
+- [x] 0.3.1.4 Enforce cache limit in `add_to_cache/3` before insertion
 
 **Implementation:**
 - Private functions in `lib/onto_view/ontology_hub.ex`
@@ -228,11 +228,11 @@ Key Design: Eviction is synchronous during load but rare in production. Metrics 
 
 ------------------------------------------------------------------------
 
-### ✅ Task 0.3.2 — LFU Eviction Strategy
+### ✅ Task 0.3.2 — LFU Eviction Strategy ✅ COMPLETED (2025-12-15)
 
-- [ ] 0.3.2.1 Implement `evict_lfu/1` finding lowest access_count set\
-- [ ] 0.3.2.2 Track `access_count` incrementing on every cache hit\
-- [ ] 0.3.2.3 Initialize access_count to 1 on first load
+- [x] 0.3.2.1 Implement `evict_lfu/1` finding lowest access_count set\
+- [x] 0.3.2.2 Track `access_count` incrementing on every cache hit\
+- [x] 0.3.2.3 Initialize access_count to 1 on first load
 
 **Implementation:**
 - Private functions in `lib/onto_view/ontology_hub.ex`
@@ -240,12 +240,12 @@ Key Design: Eviction is synchronous during load but rare in production. Metrics 
 
 ------------------------------------------------------------------------
 
-### ✅ Task 0.3.3 — Cache Metrics Tracking
+### ✅ Task 0.3.3 — Cache Metrics Tracking ✅ COMPLETED (2025-12-15)
 
-- [ ] 0.3.3.1 Increment cache_hit_count on cache hit\
-- [ ] 0.3.3.2 Increment load_count on successful load\
-- [ ] 0.3.3.3 Increment eviction_count on eviction\
-- [ ] 0.3.3.4 Compute cache_hit_rate in get_stats/0
+- [x] 0.3.3.1 Increment cache_hit_count on cache hit\
+- [x] 0.3.3.2 Increment load_count on successful load\
+- [x] 0.3.3.3 Increment eviction_count on eviction\
+- [x] 0.3.3.4 Compute cache_hit_rate in get_stats/0
 
 **Implementation:**
 - Metrics fields in State struct
