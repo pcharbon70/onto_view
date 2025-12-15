@@ -279,11 +279,14 @@ Key Design: SetResolver plug centralizes set loading logic, making it available 
 
 **Note:** This project currently has no Phoenix dependencies. Must bootstrap Phoenix first.
 
-- [ ] 0.4.1.1 Add Phoenix dependencies to mix.exs\
-- [ ] 0.4.1.2 Generate Phoenix application structure (endpoint, router, views)\
-- [ ] 0.4.1.3 Configure Phoenix in config/config.exs and config/dev.exs\
-- [ ] 0.4.1.4 Add OntologyHub to application supervision tree\
-- [ ] 0.4.1.5 Create basic Phoenix layout templates
+- [x] 0.4.1.1 Add Phoenix dependencies to mix.exs\
+- [x] 0.4.1.2 Generate Phoenix application structure (endpoint, router, views)\
+- [x] 0.4.1.3 Configure Phoenix in config/config.exs and config/dev.exs\
+- [x] 0.4.1.4 Add OntologyHub to application supervision tree\
+- [x] 0.4.1.5 Create basic Phoenix layout templates
+
+**Status:** ✅ Completed (2025-12-15)
+**Summary:** `notes/summaries/task-0.4.1-phoenix-bootstrap.md`
 
 **Implementation:**
 - Update: `mix.exs` (add phoenix, phoenix_html, phoenix_live_view)
