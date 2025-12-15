@@ -467,16 +467,19 @@ This section validates that the entire multi-ontology hub works end-to-end: conf
 
 ------------------------------------------------------------------------
 
-### ✅ Task 0.99.5 — IRI Resolution & Linked Data Workflow
+### ✅ Task 0.99.5 — IRI Resolution & Linked Data Workflow ✅ COMPLETED (2025-12-15)
 
-- [ ] 0.99.5.1 Resolve IRI to documentation view via /resolve endpoint\
-- [ ] 0.99.5.2 Validate content negotiation redirects to correct format\
-- [ ] 0.99.5.3 Resolve IRIs across multiple loaded sets\
-- [ ] 0.99.5.4 Handle IRIs present in multiple versions (selects latest stable)
+- [x] 0.99.5.1 Resolve IRI to documentation view via /resolve endpoint\
+- [x] 0.99.5.2 Validate content negotiation redirects to correct format\
+- [x] 0.99.5.3 Resolve IRIs across multiple loaded sets\
+- [x] 0.99.5.4 Handle IRIs present in multiple versions (selects latest stable)
 
-**Tests:** `test/integration/iri_resolution_test.exs`
+**Status:** ✅ Completed (2025-12-15)
 
-**Coverage:** End-to-end validation of Linked Data dereferenceable IRIs
-following W3C best practices (HTTP 303 redirects, content negotiation).
+**Summary:** notes/summaries/task-0.99.5-iri-resolution.md
+
+**Tests:** `test/integration/iri_resolution_test.exs` - 10 comprehensive tests, all passing ✅
+
+**Coverage:** End-to-end validation of Linked Data dereferenceable IRIs following W3C best practices. Validates HTTP 303 redirects, content negotiation for HTML/JSON/Turtle/RDF formats, IRI resolution across multiple loaded sets, default version selection, URL encoding/decoding, concurrent resolution performance, and error handling.
 
 ------------------------------------------------------------------------
