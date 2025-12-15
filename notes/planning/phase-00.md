@@ -161,14 +161,17 @@ W3C best practices for Semantic Web publishing.
 
 ------------------------------------------------------------------------
 
-### ✅ Task 0.2.5 — Content Negotiation Endpoint
+### ✅ Task 0.2.5 — Content Negotiation Endpoint ✅ COMPLETED (2025-12-15)
 
-- [ ] 0.2.5.1 Implement `/resolve` route accepting IRI query parameter\
-- [ ] 0.2.5.2 Support content negotiation via Accept headers\
-- [ ] 0.2.5.3 Return 303 See Other redirects for successful resolutions\
-- [ ] 0.2.5.4 Handle text/html → documentation view redirect\
-- [ ] 0.2.5.5 Handle text/turtle → TTL export redirect\
-- [ ] 0.2.5.6 Handle application/json → JSON metadata response
+- [x] 0.2.5.1 Implement `/resolve` route accepting IRI query parameter\
+- [x] 0.2.5.2 Support content negotiation via Accept headers\
+- [x] 0.2.5.3 Return 303 See Other redirects for successful resolutions\
+- [x] 0.2.5.4 Handle text/html → documentation view redirect\
+- [x] 0.2.5.5 Handle text/turtle → TTL export redirect\
+- [x] 0.2.5.6 Handle application/json → JSON metadata response
+
+**Status:** ✅ Completed (2025-12-15)
+**Summary:** notes/summaries/task-0.2.5-content-negotiation.md
 
 **Implementation:**
 - Route: `GET /resolve?iri=<url-encoded-iri>` in `lib/onto_view_web/router.ex`
