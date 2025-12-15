@@ -259,17 +259,20 @@ Key Design: Eviction is synchronous during load but rare in production. Metrics 
 
 ------------------------------------------------------------------------
 
-### ✅ Task 0.3.99 — Unit Tests: Cache Management
+### ✅ Task 0.3.99 — Unit Tests: Cache Management ✅ COMPLETED (2025-12-15)
 
-- [ ] 0.3.99.1 LRU eviction works correctly (time-based)\
-- [ ] 0.3.99.2 LFU eviction works correctly (frequency-based)\
-- [ ] 0.3.99.3 Cache metrics are accurate\
-- [ ] 0.3.99.4 Cache limit is enforced (never exceeds max)\
-- [ ] 0.3.99.5 Concurrent access is safe (100+ parallel requests)
+- [x] 0.3.99.1 LRU eviction works correctly (time-based)\
+- [x] 0.3.99.2 LFU eviction works correctly (frequency-based)\
+- [x] 0.3.99.3 Cache metrics are accurate\
+- [x] 0.3.99.4 Cache limit is enforced (never exceeds max)\
+- [x] 0.3.99.5 Concurrent access is safe (100+ parallel requests)
 
-**Tests:** `test/onto_view/ontology_hub_test.exs`
-**Coverage Target:** 90%+ for cache management
-**Note:** Test 0.3.99.5 uses `async: false` due to GenServer
+**Status:** ✅ Completed (2025-12-15)
+**Summary:** notes/summaries/task-0.3.99-cache-management-tests.md
+
+**Tests:** `test/onto_view/ontology_hub_test.exs` (lines 456-681) - 5 comprehensive tests
+**Coverage Target:** 90%+ for cache management ✅ Achieved
+**Note:** Tests use `async: false` due to GenServer shared state
 
 ------------------------------------------------------------------------
 
