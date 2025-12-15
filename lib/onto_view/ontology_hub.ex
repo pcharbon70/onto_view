@@ -65,6 +65,15 @@ defmodule OntoView.OntologyHub do
 
   @auto_load_delay_ms 1000
 
+  # OWL/RDF namespace constants for entity type detection
+  @rdf_type "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+  @owl_class "http://www.w3.org/2002/07/owl#Class"
+  @owl_object_property "http://www.w3.org/2002/07/owl#ObjectProperty"
+  @owl_datatype_property "http://www.w3.org/2002/07/owl#DatatypeProperty"
+  @owl_annotation_property "http://www.w3.org/2002/07/owl#AnnotationProperty"
+  @rdf_property "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+  @owl_named_individual "http://www.w3.org/2002/07/owl#NamedIndividual"
+
   # Client API (Public Interface)
 
   @doc """
@@ -427,16 +436,33 @@ defmodule OntoView.OntologyHub do
   def handle_call({:resolve_iri, iri}, _from, state) do
     # Check IRI index first (O(1))
     case Map.get(state.iri_index, iri) do
-      {set_id, version} = _key ->
-        # TODO: Determine entity_type from triple store
-        result = %{
-          set_id: set_id,
-          version: version,
-          entity_type: :unknown,
-          iri: iri
-        }
+      {set_id, version} = key ->
+        # Get the loaded set to determine entity type
+        case Map.get(state.loaded_sets, key) do
+          nil ->
+            # Set not loaded - return unknown type
+            result = %{
+              set_id: set_id,
+              version: version,
+              entity_type: :unknown,
+              iri: iri
+            }
 
-        {:reply, {:ok, result}, state}
+            {:reply, {:ok, result}, state}
+
+          ontology_set ->
+            # Determine entity type from triple store
+            entity_type = determine_entity_type(ontology_set.triple_store, iri)
+
+            result = %{
+              set_id: set_id,
+              version: version,
+              entity_type: entity_type,
+              iri: iri
+            }
+
+            {:reply, {:ok, result}, state}
+        end
 
       nil ->
         {:reply, {:error, :iri_not_found}, state}
@@ -569,6 +595,42 @@ defmodule OntoView.OntologyHub do
       nil -> state
       limit when is_integer(limit) and limit > 0 -> %{state | cache_limit: limit}
       _ -> state
+    end
+  end
+
+  # IRI Resolution Helpers (Task 0.2.4)
+
+  @doc false
+  @spec determine_entity_type(TripleStore.t(), String.t()) :: :class | :property | :individual | :unknown
+  defp determine_entity_type(triple_store, iri) do
+    # Get all rdf:type triples for this IRI
+    # TripleStore uses tuple format: {:iri, "http://..."}
+    triples = TripleStore.by_subject(triple_store, {:iri, iri})
+
+    # Find rdf:type assertions
+    # Predicates and objects are also tuples
+    types =
+      triples
+      |> Enum.filter(fn triple -> triple.predicate == {:iri, @rdf_type} end)
+      |> Enum.map(fn triple -> triple.object end)
+
+    cond do
+      # Check for OWL Class
+      {:iri, @owl_class} in types ->
+        :class
+
+      # Check for any property type
+      {:iri, @owl_object_property} in types or {:iri, @owl_datatype_property} in types or
+      {:iri, @owl_annotation_property} in types or {:iri, @rdf_property} in types ->
+        :property
+
+      # Check for named individual or any other type
+      {:iri, @owl_named_individual} in types or length(types) > 0 ->
+        :individual
+
+      # No type information found
+      true ->
+        :unknown
     end
   end
 end

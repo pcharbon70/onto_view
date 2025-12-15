@@ -191,6 +191,7 @@ defmodule OntoView.OntologyHub.State do
   Adds a newly loaded set to cache, evicting if necessary.
 
   If cache is at limit, evicts according to strategy before adding.
+  Updates IRI index with all subjects from the new set.
 
   ## Examples
 
@@ -215,13 +216,16 @@ defmodule OntoView.OntologyHub.State do
         state
       end
 
-    # Add the set
+    # Add the set and update IRI index
     updated_loaded_sets = Map.put(state.loaded_sets, key, ontology_set)
-    %{state | loaded_sets: updated_loaded_sets}
+    updated_iri_index = add_iris_to_index(state.iri_index, ontology_set)
+    %{state | loaded_sets: updated_loaded_sets, iri_index: updated_iri_index}
   end
 
   @doc """
   Removes a set from the cache.
+
+  Also removes all IRIs from the IRI index that belong to this set.
 
   ## Examples
 
@@ -235,7 +239,8 @@ defmodule OntoView.OntologyHub.State do
   def remove_set(%__MODULE__{} = state, set_id, version) do
     key = {set_id, version}
     updated_loaded_sets = Map.delete(state.loaded_sets, key)
-    %{state | loaded_sets: updated_loaded_sets}
+    updated_iri_index = remove_iris_from_index(state.iri_index, set_id, version)
+    %{state | loaded_sets: updated_loaded_sets, iri_index: updated_iri_index}
   end
 
   @doc """
@@ -338,5 +343,45 @@ defmodule OntoView.OntologyHub.State do
       nil -> nil
       {key, _set} -> key
     end
+  end
+
+  # IRI Index Management (Task 0.2.4)
+
+  @spec build_iri_index_for_set(OntologySet.t()) :: iri_index()
+  defp build_iri_index_for_set(%OntologySet{triple_store: nil} = ontology_set) do
+    # No triple store - return empty index
+    %{}
+  end
+
+  defp build_iri_index_for_set(%OntologySet{} = ontology_set) do
+    key = {ontology_set.set_id, ontology_set.version}
+
+    # Get all IRI subjects from the triple store's subject_index
+    # Subject index keys are tuples like {:iri, "http://..."} or {:blank, "..."}
+    # We only want IRIs, not blank nodes
+    ontology_set.triple_store.subject_index
+    |> Map.keys()
+    |> Enum.filter(fn
+      {:iri, _iri} -> true
+      _other -> false
+    end)
+    |> Enum.map(fn {:iri, iri} -> {iri, key} end)
+    |> Map.new()
+  end
+
+  @spec add_iris_to_index(iri_index(), OntologySet.t()) :: iri_index()
+  defp add_iris_to_index(iri_index, %OntologySet{} = ontology_set) do
+    set_iris = build_iri_index_for_set(ontology_set)
+    Map.merge(iri_index, set_iris)
+  end
+
+  @spec remove_iris_from_index(iri_index(), SetConfiguration.set_id(), OntologySet.version()) ::
+          iri_index()
+  defp remove_iris_from_index(iri_index, set_id, version) do
+    key = {set_id, version}
+
+    # Remove all IRIs that belong to this set
+    Enum.reject(iri_index, fn {_iri, set_key} -> set_key == key end)
+    |> Map.new()
   end
 end
