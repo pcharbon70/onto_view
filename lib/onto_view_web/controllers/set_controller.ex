@@ -44,6 +44,9 @@ defmodule OntoViewWeb.SetController do
         sets = OntologyHub.list_sets()
         set_info = Enum.find(sets, &(&1.set_id == set_id))
 
+        # Remember this set in session (Task 0.4.5)
+        conn = put_session(conn, :last_set_id, set_id)
+
         render(conn, :show,
           set_id: set_id,
           set_info: set_info,

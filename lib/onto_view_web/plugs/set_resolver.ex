@@ -83,6 +83,9 @@ defmodule OntoViewWeb.Plugs.SetResolver do
         |> assign(:triple_store, ontology_set.triple_store)
         |> assign(:set_id, set_id)
         |> assign(:version, version)
+        # Remember this set in session for Task 0.4.5
+        |> put_session(:last_set_id, set_id)
+        |> put_session(:last_version, version)
 
       {:error, :set_not_found} ->
         conn
