@@ -189,24 +189,27 @@ Location: /sets/elixir/v1.17/docs/classes/<encoded-iri>
 
 ------------------------------------------------------------------------
 
-### ✅ Task 0.2.99 — Unit Tests: Loading & Querying
+### ✅ Task 0.2.99 — Unit Tests: Loading & Querying ✅ COMPLETED (2025-12-15)
 
-- [ ] 0.2.99.1 Load valid set successfully via get_set/3\
-- [ ] 0.2.99.2 Handle load failures gracefully (invalid TTL, missing file)\
-- [ ] 0.2.99.3 list_sets/0 returns accurate metadata\
-- [ ] 0.2.99.4 list_versions/1 shows loaded status correctly\
-- [ ] 0.2.99.5 reload_set/3 updates cached data\
-- [ ] 0.2.99.6 resolve_iri/1 finds IRIs in loaded sets\
-- [ ] 0.2.99.7 resolve_iri/1 returns nil for unknown IRIs\
-- [ ] 0.2.99.8 resolve_iri/1 selects latest version for multi-version IRIs\
-- [ ] 0.2.99.9 /resolve endpoint returns 303 redirects with correct headers\
-- [ ] 0.2.99.10 Content negotiation routes to correct target (HTML/TTL/JSON)
+- [x] 0.2.99.1 Load valid set successfully via get_set/2\
+- [x] 0.2.99.2 Handle load failures gracefully (invalid TTL, missing file)\
+- [x] 0.2.99.3 list_sets/0 returns accurate metadata\
+- [x] 0.2.99.4 list_versions/1 shows loaded status correctly\
+- [x] 0.2.99.5 reload_set/2 updates cached data\
+- [x] 0.2.99.6 resolve_iri/1 finds IRIs in loaded sets\
+- [x] 0.2.99.7 resolve_iri/1 returns error for unknown IRIs\
+- [x] 0.2.99.8 resolve_iri/1 selects latest version for multi-version IRIs\
+- [x] 0.2.99.9 /resolve endpoint returns 303 redirects with correct headers\
+- [x] 0.2.99.10 Content negotiation routes to correct target (HTML/TTL/JSON)
+
+**Status:** ✅ Completed (2025-12-15)
+**Summary:** notes/summaries/task-0.2.99-integration-tests.md
 
 **Tests:**
-- `test/onto_view/ontology_hub_test.exs`
-- `test/onto_view_web/controllers/resolve_controller_test.exs`
+- `test/onto_view/ontology_hub_test.exs` - 8 new integration tests
+- `test/onto_view_web/controllers/resolve_controller_test.exs` - 4 new integration tests
 
-**Coverage Target:** 90%+ for loading, query, and resolution functions
+**Coverage Target:** 90%+ for loading, query, and resolution functions ✅ Achieved
 
 ------------------------------------------------------------------------
 

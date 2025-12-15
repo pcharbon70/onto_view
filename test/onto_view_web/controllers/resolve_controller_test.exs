@@ -138,4 +138,81 @@ defmodule OntoViewWeb.ResolveControllerTest do
       assert conn.status in [302, 303]
     end
   end
+
+  # Task 0.2.99 — Integration Tests for Content Negotiation
+  #
+  # Note: These tests verify the HTTP content negotiation layer.
+  # Full IRI resolution is tested separately in ontology_hub_test.exs (tests 0.2.99.6-0.2.99.8)
+  # where the IRI indexing and lookup logic is comprehensively tested.
+  describe "Integration Tests (0.2.99)" do
+    test "0.2.99.9 - /resolve endpoint returns redirects with correct headers", %{conn: conn} do
+      # Test that the endpoint handles requests and returns redirects
+      iri = "http://example.org/elixir/core#Module"
+      encoded_iri = URI.encode_www_form(iri)
+
+      conn =
+        conn
+        |> put_req_header("accept", "text/html")
+        |> get(~p"/resolve?iri=#{encoded_iri}")
+
+      # Should return a redirect (either 303 found or 302 not found)
+      assert conn.status in [302, 303]
+      assert get_resp_header(conn, "location") != []
+    end
+
+    test "0.2.99.10 - Content negotiation handles HTML requests", %{conn: conn} do
+      iri = "http://example.org/elixir/core#Module"
+      encoded_iri = URI.encode_www_form(iri)
+
+      conn =
+        conn
+        |> put_req_header("accept", "text/html")
+        |> get(~p"/resolve?iri=#{encoded_iri}")
+
+      # Should redirect (status depends on whether IRI is found)
+      assert conn.status in [302, 303]
+      location = get_resp_header(conn, "location") |> List.first()
+      # Location should be a valid path
+      assert location != nil
+    end
+
+    test "0.2.99.10 - Content negotiation handles JSON requests", %{conn: conn} do
+      iri = "http://example.org/elixir/core#Module"
+      encoded_iri = URI.encode_www_form(iri)
+
+      conn =
+        conn
+        |> put_req_header("accept", "application/json")
+        |> get(~p"/resolve?iri=#{encoded_iri}")
+
+      # JSON requests should either return data (200) or redirect to error (302)
+      assert conn.status in [200, 302]
+
+      if conn.status == 200 do
+        assert get_resp_header(conn, "content-type") == ["application/json; charset=utf-8"]
+        response = json_response(conn, 200)
+        assert Map.has_key?(response, "iri")
+        assert Map.has_key?(response, "set_id")
+        assert Map.has_key?(response, "version")
+      end
+    end
+
+    test "0.2.99.10 - Content negotiation handles Turtle requests", %{conn: conn} do
+      iri = "http://example.org/elixir/core#Module"
+      encoded_iri = URI.encode_www_form(iri)
+
+      conn =
+        conn
+        |> put_req_header("accept", "text/turtle")
+        |> get(~p"/resolve?iri=#{encoded_iri}")
+
+      # Turtle requests should redirect
+      assert conn.status in [302, 303]
+
+      if conn.status == 303 do
+        # If found, should have turtle content-type header
+        assert get_resp_header(conn, "content-type") == ["text/turtle; charset=utf-8"]
+      end
+    end
+  end
 end

@@ -290,4 +290,166 @@ defmodule OntoView.OntologyHubTest do
       assert is_integer(stats.uptime_seconds)
     end
   end
+
+  # Task 0.2.99 — Integration Tests: Loading & Querying
+  describe "Loading & Querying Integration (0.2.99)" do
+    setup do
+      # Configure test ontology sets
+      Application.put_env(:onto_view, :ontology_sets, [
+        [
+          set_id: "test_set",
+          name: "Test Ontology Set",
+          description: "Integration test ontology",
+          homepage_url: "http://example.org/test",
+          versions: [
+            [
+              version: "v1.0",
+              root_path: "test/support/fixtures/ontologies/valid_simple.ttl",
+              default: true
+            ],
+            [
+              version: "v2.0",
+              root_path: "test/support/fixtures/ontologies/valid_simple.ttl",
+              default: false
+            ]
+          ],
+          auto_load: false,
+          priority: 1
+        ]
+      ])
+
+      # Restart OntologyHub
+      :ok = Supervisor.terminate_child(OntoView.Supervisor, OntologyHub)
+      {:ok, _} = Supervisor.restart_child(OntoView.Supervisor, OntologyHub)
+
+      :ok
+    end
+
+    test "0.2.99.1 - Load valid set successfully via get_set/2" do
+      {:ok, ontology_set} = OntologyHub.get_set("test_set", "v1.0")
+
+      assert ontology_set.set_id == "test_set"
+      assert ontology_set.version == "v1.0"
+      assert ontology_set.triple_store != nil
+      assert is_map(ontology_set.ontologies)
+      assert map_size(ontology_set.ontologies) > 0
+    end
+
+    test "0.2.99.2 - Handle load failures gracefully (missing file)" do
+      # Configure set with non-existent file
+      Application.put_env(:onto_view, :ontology_sets, [
+        [
+          set_id: "broken_set",
+          name: "Broken Set",
+          versions: [[version: "v1.0", root_path: "nonexistent/file.ttl", default: true]],
+          auto_load: false
+        ]
+      ])
+
+      :ok = Supervisor.terminate_child(OntoView.Supervisor, OntologyHub)
+      {:ok, _} = Supervisor.restart_child(OntoView.Supervisor, OntologyHub)
+
+      assert {:error, _reason} = OntologyHub.get_set("broken_set", "v1.0")
+
+      # Verify GenServer is still operational
+      assert Process.whereis(OntologyHub) != nil
+    end
+
+    test "0.2.99.3 - list_sets/0 returns accurate metadata" do
+      sets = OntologyHub.list_sets()
+
+      assert length(sets) == 1
+      set = hd(sets)
+
+      assert set.set_id == "test_set"
+      assert set.name == "Test Ontology Set"
+      assert set.description == "Integration test ontology"
+      assert set.homepage_url == "http://example.org/test"
+      assert length(set.versions) == 2
+      assert set.default_version == "v1.0"
+      assert set.priority == 1
+    end
+
+    test "0.2.99.4 - list_versions/1 shows loaded status correctly" do
+      # Initially no versions loaded
+      {:ok, versions} = OntologyHub.list_versions("test_set")
+      assert length(versions) == 2
+
+      v1 = Enum.find(versions, &(&1.version == "v1.0"))
+      v2 = Enum.find(versions, &(&1.version == "v2.0"))
+
+      assert v1.loaded == false
+      assert v2.loaded == false
+
+      # Load v1.0
+      {:ok, _} = OntologyHub.get_set("test_set", "v1.0")
+
+      # Check status again
+      {:ok, versions_after} = OntologyHub.list_versions("test_set")
+      v1_after = Enum.find(versions_after, &(&1.version == "v1.0"))
+      v2_after = Enum.find(versions_after, &(&1.version == "v2.0"))
+
+      assert v1_after.loaded == true
+      assert v2_after.loaded == false
+    end
+
+    test "0.2.99.5 - reload_set/2 updates cached data" do
+      # Load the set initially
+      {:ok, set1} = OntologyHub.get_set("test_set", "v1.0")
+      initial_load_time = set1.loaded_at
+
+      # Wait a moment to ensure timestamp changes
+      Process.sleep(10)
+
+      # Reload the set
+      assert :ok = OntologyHub.reload_set("test_set", "v1.0")
+
+      # Get the set again to verify it was reloaded
+      {:ok, set2} = OntologyHub.get_set("test_set", "v1.0")
+      reloaded_time = set2.loaded_at
+
+      # Verify it was reloaded (timestamp should be different)
+      assert DateTime.compare(reloaded_time, initial_load_time) == :gt
+
+      # Verify data is still correct
+      assert set2.set_id == "test_set"
+      assert set2.version == "v1.0"
+      assert set2.triple_store != nil
+    end
+
+    test "0.2.99.6 - resolve_iri/1 finds IRIs in loaded sets" do
+      # Load the set first
+      {:ok, _} = OntologyHub.get_set("test_set", "v1.0")
+
+      # Resolve an IRI that exists in the fixture
+      iri = "http://example.org/elixir/core#Module"
+      {:ok, result} = OntologyHub.resolve_iri(iri)
+
+      assert result.iri == iri
+      assert result.set_id == "test_set"
+      assert result.version == "v1.0"
+      assert result.entity_type == :class
+    end
+
+    test "0.2.99.7 - resolve_iri/1 returns error for unknown IRIs" do
+      # Load the set first
+      {:ok, _} = OntologyHub.get_set("test_set", "v1.0")
+
+      # Try to resolve an IRI that doesn't exist
+      iri = "http://example.org/nonexistent#Thing"
+      assert {:error, :iri_not_found} = OntologyHub.resolve_iri(iri)
+    end
+
+    test "0.2.99.8 - resolve_iri/1 selects latest version for multi-version IRIs" do
+      # Load both versions
+      {:ok, _} = OntologyHub.get_set("test_set", "v1.0")
+      {:ok, _} = OntologyHub.get_set("test_set", "v2.0")
+
+      # Resolve an IRI - should get v2.0 (latest)
+      iri = "http://example.org/elixir/core#Module"
+      {:ok, result} = OntologyHub.resolve_iri(iri)
+
+      assert result.version == "v2.0"
+    end
+  end
 end
