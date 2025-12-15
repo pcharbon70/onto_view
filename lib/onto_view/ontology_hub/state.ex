@@ -348,7 +348,7 @@ defmodule OntoView.OntologyHub.State do
   # IRI Index Management (Task 0.2.4)
 
   @spec build_iri_index_for_set(OntologySet.t()) :: iri_index()
-  defp build_iri_index_for_set(%OntologySet{triple_store: nil} = ontology_set) do
+  defp build_iri_index_for_set(%OntologySet{triple_store: nil} = _ontology_set) do
     # No triple store - return empty index
     %{}
   end

@@ -8,8 +8,10 @@ defmodule OntoView.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      # Starts a worker by calling: OntoView.Worker.start_link(arg)
-      # {OntoView.Worker, arg}
+      {Phoenix.PubSub, name: OntoView.PubSub},
+      OntoViewWeb.Telemetry,
+      OntoViewWeb.Endpoint,
+      OntoView.OntologyHub
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
