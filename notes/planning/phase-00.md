@@ -316,10 +316,13 @@ Key Design: SetResolver plug centralizes set loading logic, making it available 
 
 ### ✅ Task 0.4.3 — Route Structure Definition
 
-- [ ] 0.4.3.1 Define landing page and set browser routes\
-- [ ] 0.4.3.2 Define set+version scoped documentation routes (placeholder LiveViews)\
-- [ ] 0.4.3.3 Define IRI resolution endpoint for content negotiation\
-- [ ] 0.4.3.4 Add SetResolver plug to browser pipeline
+- [x] 0.4.3.1 Define landing page and set browser routes\
+- [x] 0.4.3.2 Define set+version scoped documentation routes (placeholder LiveViews)\
+- [x] 0.4.3.3 Define IRI resolution endpoint for content negotiation\
+- [x] 0.4.3.4 Add SetResolver plug to browser pipeline
+
+**Status:** ✅ Completed (2025-12-15)
+**Summary:** `notes/summaries/task-0.4.3-route-structure.md`
 
 **Implementation:**
 - Update: `lib/onto_view_web/router.ex`

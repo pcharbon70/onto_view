@@ -8,6 +8,7 @@ defmodule OntoViewWeb.Router do
     plug :put_root_layout, html: {OntoViewWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug OntoViewWeb.Plugs.SetResolver
   end
 
   pipeline :api do
@@ -17,7 +18,18 @@ defmodule OntoViewWeb.Router do
   scope "/", OntoViewWeb do
     pipe_through :browser
 
+    # Landing page
     get "/", PageController, :home
+
+    # Set browser and version selector
+    get "/sets", SetController, :index
+    get "/sets/:set_id", SetController, :show
+
+    # IRI resolution endpoint (Task 0.2.5)
+    get "/resolve", ResolveController, :resolve
+
+    # Documentation routes (scoped by set and version)
+    live "/sets/:set_id/:version/docs", DocsLive.Index, :index
   end
 
   # Enable LiveDashboard in development
