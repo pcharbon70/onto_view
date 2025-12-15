@@ -60,6 +60,7 @@ defmodule OntoViewWeb.Plugs.SetResolverTest do
     test "loads and assigns ontology set when both set_id and version present", %{conn: conn} do
       conn =
         conn
+        |> Plug.Test.init_test_session(%{})
         |> Map.put(:path_params, %{"set_id" => "test_set", "version" => "v1.0"})
         |> SetResolver.call([])
 
@@ -135,6 +136,7 @@ defmodule OntoViewWeb.Plugs.SetResolverTest do
       # First request - cache miss
       conn1 =
         conn
+        |> Plug.Test.init_test_session(%{})
         |> Map.put(:path_params, %{"set_id" => "test_set", "version" => "v1.0"})
         |> SetResolver.call([])
 
@@ -143,6 +145,7 @@ defmodule OntoViewWeb.Plugs.SetResolverTest do
       # Second request - should hit cache
       conn2 =
         build_conn()
+        |> Plug.Test.init_test_session(%{})
         |> Map.put(:path_params, %{"set_id" => "test_set", "version" => "v1.0"})
         |> SetResolver.call([])
 
@@ -151,6 +154,34 @@ defmodule OntoViewWeb.Plugs.SetResolverTest do
       # Verify cache hit by checking stats
       stats = OntologyHub.get_stats()
       assert stats.cache_hit_count >= 1
+    end
+
+    test "0.4.99.2 - SetResolver plug loads correct ontology into assigns", %{conn: conn} do
+      conn =
+        conn
+        |> Plug.Test.init_test_session(%{})
+        |> Map.put(:path_params, %{"set_id" => "test_set", "version" => "v1.0"})
+        |> SetResolver.call([])
+
+      # Verify all expected assigns are present
+      assert conn.assigns.set_id == "test_set"
+      assert conn.assigns.version == "v1.0"
+      assert %OntoView.OntologyHub.OntologySet{} = conn.assigns.ontology_set
+      assert conn.assigns.triple_store != nil
+      assert conn.assigns.ontology_set.set_id == "test_set"
+      assert conn.assigns.ontology_set.version == "v1.0"
+    end
+
+    test "0.4.99.4 - Session remembers last-viewed set and version", %{conn: conn} do
+      conn =
+        conn
+        |> Plug.Test.init_test_session(%{})
+        |> Map.put(:path_params, %{"set_id" => "test_set", "version" => "v1.0"})
+        |> SetResolver.call([])
+
+      # Verify session was updated
+      assert get_session(conn, :last_set_id) == "test_set"
+      assert get_session(conn, :last_version) == "v1.0"
     end
   end
 end

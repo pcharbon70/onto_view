@@ -345,13 +345,14 @@ Key Design: SetResolver plug centralizes set loading logic, making it available 
 
 ------------------------------------------------------------------------
 
-### ✅ Task 0.4.4 — Set Selection UI Controllers
+### ✅ Task 0.4.4 — Set Selection UI Controllers ✅ COMPLETED (Previously)
 
-- [ ] 0.4.4.1 Create PageController with landing page action\
-- [ ] 0.4.4.2 Create SetController with index action (list sets)\
-- [ ] 0.4.4.3 Create SetController with show action (list versions for a set)\
-- [ ] 0.4.4.4 Create placeholder DocsLive.Index LiveView
+- [x] 0.4.4.1 Create PageController with landing page action\
+- [x] 0.4.4.2 Create SetController with index action (list sets)\
+- [x] 0.4.4.3 Create SetController with show action (list versions for a set)\
+- [x] 0.4.4.4 Create placeholder DocsLive.Index LiveView
 
+**Status:** ✅ Completed (Previously)
 **Implementation:**
 - Module: `lib/onto_view_web/controllers/page_controller.ex`
 - Module: `lib/onto_view_web/controllers/set_controller.ex`
@@ -360,34 +361,43 @@ Key Design: SetResolver plug centralizes set loading logic, making it available 
 
 ------------------------------------------------------------------------
 
-### ✅ Task 0.4.5 — Session-Based Set Memory
+### ✅ Task 0.4.5 — Session-Based Set Memory ✅ COMPLETED (2025-12-15)
 
-- [ ] 0.4.5.1 Remember last-viewed set_id in session\
-- [ ] 0.4.5.2 Redirect to last-viewed set on landing page (if available)
+- [x] 0.4.5.1 Remember last-viewed set_id in session\
+- [x] 0.4.5.2 Redirect to last-viewed set on landing page (if available)
+
+**Status:** ✅ Completed (2025-12-15)
+**Summary:** notes/summaries/section-0.4-routing-ui-completion.md
 
 **Implementation:**
-- Update: `lib/onto_view_web/controllers/page_controller.ex`
+- Update: `lib/onto_view_web/controllers/page_controller.ex` - Session-based redirect logic
+- Update: `lib/onto_view_web/controllers/set_controller.ex` - Store last_set_id
+- Update: `lib/onto_view_web/plugs/set_resolver.ex` - Store last_set_id and last_version
 - Pattern: `put_session(conn, :last_set_id, set_id)` when viewing a set
-- Landing page: Check session, redirect to last_set if present
+- Pattern: `put_session(conn, :last_version, version)` when viewing docs
+- Landing page: Check session, redirect to last_set/version if present
 
 ------------------------------------------------------------------------
 
-### ✅ Task 0.4.99 — Unit Tests: Routing Integration
+### ✅ Task 0.4.99 — Unit Tests: Routing Integration ✅ COMPLETED (2025-12-15)
 
-- [ ] 0.4.99.1 Routes resolve correctly for valid set+version\
-- [ ] 0.4.99.2 SetResolver plug loads correct ontology into assigns\
-- [ ] 0.4.99.3 Invalid set redirects to /sets with error flash\
-- [ ] 0.4.99.4 Session remembers last-viewed set\
-- [ ] 0.4.99.5 /resolve endpoint redirects known IRIs correctly\
-- [ ] 0.4.99.6 /resolve endpoint returns 404 for unknown IRIs\
-- [ ] 0.4.99.7 Content negotiation headers route to correct endpoints
+- [x] 0.4.99.1 Routes resolve correctly for valid set+version\
+- [x] 0.4.99.2 SetResolver plug loads correct ontology into assigns\
+- [x] 0.4.99.3 Invalid set redirects to /sets with error flash\
+- [x] 0.4.99.4 Session remembers last-viewed set\
+- [x] 0.4.99.5 /resolve endpoint redirects known IRIs correctly\
+- [x] 0.4.99.6 /resolve endpoint returns 404 for unknown IRIs\
+- [x] 0.4.99.7 Content negotiation headers route to correct endpoints
 
-**Tests:**
-- `test/onto_view_web/plugs/set_resolver_test.exs`
-- `test/onto_view_web/controllers/set_controller_test.exs`
-- `test/onto_view_web/controllers/page_controller_test.exs`
-- `test/onto_view_web/controllers/resolve_controller_test.exs`
-- `test/onto_view_web/live/docs_live_test.exs`
+**Status:** ✅ Completed (2025-12-15)
+**Summary:** notes/summaries/section-0.4-routing-ui-completion.md
+
+**Tests:** 43 tests total, all passing ✅
+- `test/onto_view_web/plugs/set_resolver_test.exs` - 9 tests
+- `test/onto_view_web/controllers/set_controller_test.exs` - 10 tests
+- `test/onto_view_web/controllers/page_controller_test.exs` - 4 tests (NEW)
+- `test/onto_view_web/controllers/resolve_controller_test.exs` - 17 tests
+- `test/onto_view_web/live/docs_live_test.exs` - 3 tests
 
 ------------------------------------------------------------------------
 
