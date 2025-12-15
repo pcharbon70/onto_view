@@ -37,11 +37,26 @@ defmodule OntoView.MixProject do
       # RDF and semantic web
       {:rdf, "~> 2.1"},
 
+      # Phoenix and web
+      {:phoenix, "~> 1.7.14"},
+      {:phoenix_html, "~> 4.1"},
+      {:phoenix_live_view, "~> 0.20.17"},
+      {:phoenix_live_dashboard, "~> 0.8.4"},
+      {:telemetry_metrics, "~> 1.0"},
+      {:telemetry_poller, "~> 1.1"},
+      {:plug_cowboy, "~> 2.7"},
+      {:bandit, "~> 1.5"},
+      {:gettext, "~> 0.20"},
+      {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
+      {:tailwind, "~> 0.2", runtime: Mix.env() == :dev},
+
       # Testing and development
+      {:phoenix_live_reload, "~> 1.5", only: :dev},
       {:ex_doc, "~> 0.31", only: :dev, runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:excoveralls, "~> 0.18", only: :test},
+      {:floki, ">= 0.30.0", only: :test},
 
       # Utilities
       {:jason, "~> 1.4"}
