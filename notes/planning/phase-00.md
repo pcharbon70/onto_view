@@ -299,10 +299,13 @@ Key Design: SetResolver plug centralizes set loading logic, making it available 
 
 ### ✅ Task 0.4.2 — SetResolver Plug
 
-- [ ] 0.4.2.1 Create SetResolver plug extracting set_id and version from path params\
-- [ ] 0.4.2.2 Call OntologyHub.get_set/2 to load ontology set\
-- [ ] 0.4.2.3 Assign loaded set to conn.assigns (ontology_set, triple_store, set_id, version)\
-- [ ] 0.4.2.4 Handle missing sets with graceful redirect to /sets
+- [x] 0.4.2.1 Create SetResolver plug extracting set_id and version from path params\
+- [x] 0.4.2.2 Call OntologyHub.get_set/2 to load ontology set\
+- [x] 0.4.2.3 Assign loaded set to conn.assigns (ontology_set, triple_store, set_id, version)\
+- [x] 0.4.2.4 Handle missing sets with graceful redirect to /sets
+
+**Status:** ✅ Completed (2025-12-15)
+**Summary:** `notes/summaries/task-0.4.2-set-resolver-plug.md`
 
 **Implementation:**
 - Module: `lib/onto_view_web/plugs/set_resolver.ex`
