@@ -1,0 +1,25 @@
+@prefix main: <http://example.org/main#> .
+@prefix base: <http://example.org/base#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+# Ontology declaration with import
+<http://example.org/main#> a owl:Ontology ;
+    rdfs:label "Main Classes Ontology"@en ;
+    rdfs:comment "Main ontology that imports base classes"@en ;
+    owl:imports <file://test/support/fixtures/ontologies/entity_extraction/classes_imported.ttl> .
+
+# Classes defined in this ontology, extending imported base classes
+main:Project a owl:Class ;
+    rdfs:label "Project"@en ;
+    rdfs:comment "A project with a goal"@en .
+
+main:Task a owl:Class ;
+    rdfs:label "Task"@en ;
+    rdfs:comment "A unit of work"@en .
+
+main:Team a owl:Class ;
+    rdfs:label "Team"@en ;
+    rdfs:comment "A group of agents working together"@en ;
+    rdfs:subClassOf base:Agent .

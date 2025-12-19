@@ -1,0 +1,24 @@
+@prefix base: <http://example.org/base#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+# Ontology declaration with import
+<http://example.org/base#> a owl:Ontology ;
+    rdfs:label "Base Classes Ontology"@en ;
+    rdfs:comment "Base ontology imported by classes.ttl for multi-graph testing"@en .
+
+# Base classes defined in this ontology
+base:Thing a owl:Class ;
+    rdfs:label "Thing"@en ;
+    rdfs:comment "The root class"@en .
+
+base:Agent a owl:Class ;
+    rdfs:label "Agent"@en ;
+    rdfs:comment "An entity capable of action"@en ;
+    rdfs:subClassOf base:Thing .
+
+base:Location a owl:Class ;
+    rdfs:label "Location"@en ;
+    rdfs:comment "A physical or virtual place"@en ;
+    rdfs:subClassOf base:Thing .

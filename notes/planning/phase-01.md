@@ -196,9 +196,18 @@ imported ontologies.
 
 ### ✅ Task 1.3.1 --- Class Extraction
 
--   [ ] 1.3.1.1 Detect `owl:Class`\
--   [ ] 1.3.1.2 Extract class IRIs\
--   [ ] 1.3.1.3 Attach ontology-of-origin metadata
+-   [x] 1.3.1.1 Detect `owl:Class`\
+-   [x] 1.3.1.2 Extract class IRIs\
+-   [x] 1.3.1.3 Attach ontology-of-origin metadata
+
+**Status:** ✅ COMPLETED (2025-12-19)
+**Implementation:** `lib/onto_view/ontology/entity/class.ex`
+**Tests:** `test/onto_view/ontology/entity/class_test.exs` (26 tests, 100% coverage)
+**Fixtures:**
+- `test/support/fixtures/ontologies/entity_extraction/classes.ttl`
+- `test/support/fixtures/ontologies/entity_extraction/classes_imported.ttl`
+- `test/support/fixtures/ontologies/entity_extraction/classes_with_imports.ttl`
+**Summary:** `notes/summaries/task-1.3.1-class-extraction-summary.md`
 
 ------------------------------------------------------------------------
 
