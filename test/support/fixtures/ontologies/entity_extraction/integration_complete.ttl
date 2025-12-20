@@ -1,0 +1,133 @@
+@prefix ex: <http://example.org/integration#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# ============================================================================
+# Integration Test Ontology for Task 1.3.99
+# This ontology contains all OWL entity types for comprehensive testing
+# ============================================================================
+
+<http://example.org/integration#> a owl:Ontology ;
+    rdfs:label "OWL Entity Extraction Integration Test Ontology"@en ;
+    rdfs:comment "Complete test ontology for Task 1.3.99 integration tests"@en .
+
+# ============================================================================
+# OWL Classes (6 classes)
+# ============================================================================
+
+ex:LivingThing a owl:Class ;
+    rdfs:label "Living Thing"@en ;
+    rdfs:comment "The root class for all living entities"@en .
+
+ex:Animal a owl:Class ;
+    rdfs:label "Animal"@en ;
+    rdfs:comment "An animal"@en ;
+    rdfs:subClassOf ex:LivingThing .
+
+ex:Person a owl:Class ;
+    rdfs:label "Person"@en ;
+    rdfs:comment "A human being"@en ;
+    rdfs:subClassOf ex:Animal .
+
+ex:Organization a owl:Class ;
+    rdfs:label "Organization"@en ;
+    rdfs:comment "A group of people"@en .
+
+ex:Location a owl:Class ;
+    rdfs:label "Location"@en ;
+    rdfs:comment "A physical or virtual location"@en .
+
+ex:Event a owl:Class ;
+    rdfs:label "Event"@en ;
+    rdfs:comment "Something that happens"@en .
+
+# ============================================================================
+# Object Properties (4 properties)
+# ============================================================================
+
+ex:knows a owl:ObjectProperty ;
+    rdfs:label "knows"@en ;
+    rdfs:comment "One person knows another"@en ;
+    rdfs:domain ex:Person ;
+    rdfs:range ex:Person .
+
+ex:worksFor a owl:ObjectProperty ;
+    rdfs:label "works for"@en ;
+    rdfs:comment "A person works for an organization"@en ;
+    rdfs:domain ex:Person ;
+    rdfs:range ex:Organization .
+
+ex:locatedIn a owl:ObjectProperty ;
+    rdfs:label "located in"@en ;
+    rdfs:comment "Something is located in a place"@en ;
+    rdfs:range ex:Location .
+
+ex:participatesIn a owl:ObjectProperty ;
+    rdfs:label "participates in"@en ;
+    rdfs:comment "A person participates in an event"@en ;
+    rdfs:domain ex:Person ;
+    rdfs:range ex:Event .
+
+# ============================================================================
+# Data Properties (5 properties)
+# ============================================================================
+
+ex:hasName a owl:DatatypeProperty ;
+    rdfs:label "has name"@en ;
+    rdfs:comment "The name of an entity"@en ;
+    rdfs:range xsd:string .
+
+ex:hasAge a owl:DatatypeProperty ;
+    rdfs:label "has age"@en ;
+    rdfs:comment "The age in years"@en ;
+    rdfs:domain ex:Person ;
+    rdfs:range xsd:integer .
+
+ex:hasEmail a owl:DatatypeProperty ;
+    rdfs:label "has email"@en ;
+    rdfs:comment "Email address"@en ;
+    rdfs:domain ex:Person ;
+    rdfs:range xsd:string .
+
+ex:foundedDate a owl:DatatypeProperty ;
+    rdfs:label "founded date"@en ;
+    rdfs:comment "Date an organization was founded"@en ;
+    rdfs:domain ex:Organization ;
+    rdfs:range xsd:date .
+
+ex:isActive a owl:DatatypeProperty ;
+    rdfs:label "is active"@en ;
+    rdfs:comment "Whether something is active"@en ;
+    rdfs:range xsd:boolean .
+
+# ============================================================================
+# Named Individuals (5 individuals)
+# ============================================================================
+
+ex:Alice a owl:NamedIndividual, ex:Person ;
+    rdfs:label "Alice"@en ;
+    ex:hasName "Alice Smith" ;
+    ex:hasAge 30 ;
+    ex:hasEmail "alice@example.org" .
+
+ex:Bob a owl:NamedIndividual, ex:Person ;
+    rdfs:label "Bob"@en ;
+    ex:hasName "Bob Jones" ;
+    ex:hasAge 35 ;
+    ex:knows ex:Alice .
+
+ex:AcmeCorp a owl:NamedIndividual, ex:Organization ;
+    rdfs:label "Acme Corporation"@en ;
+    ex:hasName "Acme Corp" ;
+    ex:foundedDate "1990-01-15"^^xsd:date .
+
+ex:NewYork a owl:NamedIndividual, ex:Location ;
+    rdfs:label "New York"@en ;
+    ex:hasName "New York City" .
+
+ex:Conference2024 a owl:NamedIndividual, ex:Event ;
+    rdfs:label "Annual Conference 2024"@en ;
+    ex:hasName "Tech Conference 2024" ;
+    ex:locatedIn ex:NewYork .

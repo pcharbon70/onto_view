@@ -256,10 +256,16 @@ imported ontologies.
 
 ### ✅ Task 1.3.99 --- Unit Tests: OWL Entity Extraction
 
--   [ ] 1.3.99.1 Detects all classes correctly\
--   [ ] 1.3.99.2 Detects all properties correctly\
--   [ ] 1.3.99.3 Detects all individuals correctly\
--   [ ] 1.3.99.4 Prevents duplicate IRIs
+-   [x] 1.3.99.1 Detects all classes correctly\
+-   [x] 1.3.99.2 Detects all properties correctly\
+-   [x] 1.3.99.3 Detects all individuals correctly\
+-   [x] 1.3.99.4 Prevents duplicate IRIs
+
+**Status:** ✅ COMPLETED (2025-12-20)
+**Tests:** `test/onto_view/ontology/entity/entity_extraction_integration_test.exs` (34 tests)
+**Fixtures:**
+- `test/support/fixtures/ontologies/entity_extraction/integration_complete.ttl`
+**Summary:** `notes/summaries/task-1.3.99-entity-extraction-integration-summary.md`
 
 ------------------------------------------------------------------------
 
