@@ -301,8 +301,14 @@ visualization.
 
 ### ✅ Task 1.4.1 --- Parent → Child Graph
 
--   [ ] 1.4.1.1 Build subclass adjacency list\
--   [ ] 1.4.1.2 Normalize `owl:Thing` as root
+-   [x] 1.4.1.1 Build subclass adjacency list\
+-   [x] 1.4.1.2 Normalize `owl:Thing` as root
+
+**Status:** ✅ COMPLETED (2025-12-20)
+**Implementation:** `lib/onto_view/ontology/hierarchy/class_hierarchy.ex` (289 lines)
+**Tests:** `test/onto_view/ontology/hierarchy/class_hierarchy_test.exs` (30 tests)
+**Fixture:** `test/support/fixtures/ontologies/class_hierarchy.ttl`
+**Summary:** `notes/summaries/task-1.4.1-parent-child-graph-summary.md`
 
 ------------------------------------------------------------------------
 

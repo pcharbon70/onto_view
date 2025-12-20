@@ -111,6 +111,10 @@ defmodule OntoView.Ontology.Namespaces do
   @spec owl_imports() :: {:iri, String.t()}
   def owl_imports, do: {:iri, owl() <> "imports"}
 
+  @doc "Returns the owl:Thing IRI as a tagged tuple."
+  @spec owl_thing() :: {:iri, String.t()}
+  def owl_thing, do: {:iri, owl() <> "Thing"}
+
   # ==========================================================================
   # OWL Property Characteristics
   # ==========================================================================

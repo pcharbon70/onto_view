@@ -1,0 +1,137 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix ex: <http://example.org/hierarchy#> .
+
+# Ontology declaration
+ex: a owl:Ontology ;
+    rdfs:label "Class Hierarchy Test Ontology" ;
+    rdfs:comment "Test fixture for class hierarchy extraction (Task 1.4.1)" .
+
+# ============================================================================
+# Simple Linear Hierarchy: Animal → Mammal → Dog
+# ============================================================================
+
+ex:Animal a owl:Class ;
+    rdfs:label "Animal" ;
+    rdfs:comment "Top-level class in the animal hierarchy" .
+
+ex:Mammal a owl:Class ;
+    rdfs:subClassOf ex:Animal ;
+    rdfs:label "Mammal" ;
+    rdfs:comment "Warm-blooded vertebrates" .
+
+ex:Dog a owl:Class ;
+    rdfs:subClassOf ex:Mammal ;
+    rdfs:label "Dog" ;
+    rdfs:comment "Domesticated canine" .
+
+ex:Cat a owl:Class ;
+    rdfs:subClassOf ex:Mammal ;
+    rdfs:label "Cat" ;
+    rdfs:comment "Domesticated feline" .
+
+# ============================================================================
+# Multiple Inheritance: Student, Employee → WorkingStudent
+# ============================================================================
+
+ex:Person a owl:Class ;
+    rdfs:label "Person" ;
+    rdfs:comment "A human being" .
+
+ex:Student a owl:Class ;
+    rdfs:subClassOf ex:Person ;
+    rdfs:label "Student" ;
+    rdfs:comment "A person enrolled in education" .
+
+ex:Employee a owl:Class ;
+    rdfs:subClassOf ex:Person ;
+    rdfs:label "Employee" ;
+    rdfs:comment "A person who works for an employer" .
+
+ex:WorkingStudent a owl:Class ;
+    rdfs:subClassOf ex:Student ;
+    rdfs:subClassOf ex:Employee ;
+    rdfs:label "Working Student" ;
+    rdfs:comment "A student who also works (multiple inheritance)" .
+
+# ============================================================================
+# Orphan Class (no rdfs:subClassOf - should be child of owl:Thing)
+# ============================================================================
+
+ex:Event a owl:Class ;
+    rdfs:label "Event" ;
+    rdfs:comment "An occurrence without explicit superclass" .
+
+ex:Conference a owl:Class ;
+    rdfs:subClassOf ex:Event ;
+    rdfs:label "Conference" ;
+    rdfs:comment "A formal meeting for discussion" .
+
+# ============================================================================
+# Another orphan class
+# ============================================================================
+
+ex:Location a owl:Class ;
+    rdfs:label "Location" ;
+    rdfs:comment "A geographical place (no superclass)" .
+
+# ============================================================================
+# Deep Hierarchy: A → B → C → D → E (depth 4)
+# ============================================================================
+
+ex:LevelA a owl:Class ;
+    rdfs:label "Level A" ;
+    rdfs:comment "Depth level 0" .
+
+ex:LevelB a owl:Class ;
+    rdfs:subClassOf ex:LevelA ;
+    rdfs:label "Level B" ;
+    rdfs:comment "Depth level 1" .
+
+ex:LevelC a owl:Class ;
+    rdfs:subClassOf ex:LevelB ;
+    rdfs:label "Level C" ;
+    rdfs:comment "Depth level 2" .
+
+ex:LevelD a owl:Class ;
+    rdfs:subClassOf ex:LevelC ;
+    rdfs:label "Level D" ;
+    rdfs:comment "Depth level 3" .
+
+ex:LevelE a owl:Class ;
+    rdfs:subClassOf ex:LevelD ;
+    rdfs:label "Level E" ;
+    rdfs:comment "Depth level 4 (leaf)" .
+
+# ============================================================================
+# Wide Hierarchy: Parent with many children
+# ============================================================================
+
+ex:Vehicle a owl:Class ;
+    rdfs:label "Vehicle" ;
+    rdfs:comment "A means of transportation" .
+
+ex:Car a owl:Class ;
+    rdfs:subClassOf ex:Vehicle ;
+    rdfs:label "Car" .
+
+ex:Truck a owl:Class ;
+    rdfs:subClassOf ex:Vehicle ;
+    rdfs:label "Truck" .
+
+ex:Motorcycle a owl:Class ;
+    rdfs:subClassOf ex:Vehicle ;
+    rdfs:label "Motorcycle" .
+
+ex:Bicycle a owl:Class ;
+    rdfs:subClassOf ex:Vehicle ;
+    rdfs:label "Bicycle" .
+
+ex:Boat a owl:Class ;
+    rdfs:subClassOf ex:Vehicle ;
+    rdfs:label "Boat" .
+
+ex:Airplane a owl:Class ;
+    rdfs:subClassOf ex:Vehicle ;
+    rdfs:label "Airplane" .
