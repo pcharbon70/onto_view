@@ -213,9 +213,16 @@ imported ontologies.
 
 ### ✅ Task 1.3.2 --- Object Property Extraction
 
--   [ ] 1.3.2.1 Detect `owl:ObjectProperty`\
--   [ ] 1.3.2.2 Register domain placeholders\
--   [ ] 1.3.2.3 Register range placeholders
+-   [x] 1.3.2.1 Detect `owl:ObjectProperty`\
+-   [x] 1.3.2.2 Register domain placeholders\
+-   [x] 1.3.2.3 Register range placeholders
+
+**Status:** ✅ COMPLETED (2025-12-20)
+**Implementation:** `lib/onto_view/ontology/entity/object_property.ex`
+**Tests:** `test/onto_view/ontology/entity/object_property_test.exs` (39 tests, 100% coverage)
+**Fixtures:**
+- `test/support/fixtures/ontologies/entity_extraction/object_properties.ttl`
+**Summary:** `notes/summaries/task-1.3.2-object-property-extraction-summary.md`
 
 ------------------------------------------------------------------------
 

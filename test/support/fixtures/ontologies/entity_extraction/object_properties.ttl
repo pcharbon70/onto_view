@@ -1,0 +1,94 @@
+@prefix ex: <http://example.org/properties#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# Ontology declaration
+<http://example.org/properties#> a owl:Ontology ;
+    rdfs:label "Object Property Test Ontology"@en ;
+    rdfs:comment "Test ontology for OWL object property extraction (Task 1.3.2)"@en .
+
+# Classes for domain/range testing
+ex:Animal a owl:Class ;
+    rdfs:label "Animal"@en .
+
+ex:Person a owl:Class ;
+    rdfs:label "Person"@en ;
+    rdfs:subClassOf ex:Animal .
+
+ex:Organization a owl:Class ;
+    rdfs:label "Organization"@en .
+
+ex:Location a owl:Class ;
+    rdfs:label "Location"@en .
+
+ex:Project a owl:Class ;
+    rdfs:label "Project"@en .
+
+# Object Property with domain and range (Task 1.3.2.1, 1.3.2.2, 1.3.2.3)
+ex:worksFor a owl:ObjectProperty ;
+    rdfs:label "works for"@en ;
+    rdfs:comment "Indicates employment relationship"@en ;
+    rdfs:domain ex:Person ;
+    rdfs:range ex:Organization .
+
+# Object Property with multiple domains
+ex:participatesIn a owl:ObjectProperty ;
+    rdfs:label "participates in"@en ;
+    rdfs:domain ex:Person ;
+    rdfs:domain ex:Organization ;
+    rdfs:range ex:Project .
+
+# Object Property with multiple ranges
+ex:locatedIn a owl:ObjectProperty ;
+    rdfs:label "located in"@en ;
+    rdfs:domain ex:Organization ;
+    rdfs:range ex:Location ;
+    rdfs:range ex:Organization .
+
+# Object Property with no domain/range (untyped)
+ex:relatedTo a owl:ObjectProperty ;
+    rdfs:label "related to"@en ;
+    rdfs:comment "A generic relationship without domain/range constraints"@en .
+
+# Object Property with only domain (no range)
+ex:owns a owl:ObjectProperty ;
+    rdfs:label "owns"@en ;
+    rdfs:domain ex:Person .
+
+# Object Property with only range (no domain)
+ex:ownedBy a owl:ObjectProperty ;
+    rdfs:label "owned by"@en ;
+    rdfs:range ex:Person .
+
+# Inverse property relationship
+ex:employs a owl:ObjectProperty ;
+    rdfs:label "employs"@en ;
+    rdfs:domain ex:Organization ;
+    rdfs:range ex:Person ;
+    owl:inverseOf ex:worksFor .
+
+# Symmetric property
+ex:knows a owl:ObjectProperty ;
+    rdfs:label "knows"@en ;
+    rdfs:domain ex:Person ;
+    rdfs:range ex:Person ;
+    a owl:SymmetricProperty .
+
+# Transitive property
+ex:ancestorOf a owl:ObjectProperty ;
+    rdfs:label "ancestor of"@en ;
+    rdfs:domain ex:Person ;
+    rdfs:range ex:Person ;
+    a owl:TransitiveProperty .
+
+# Data Property (should NOT be extracted by ObjectProperty module)
+ex:hasName a owl:DatatypeProperty ;
+    rdfs:label "has name"@en ;
+    rdfs:domain ex:Person ;
+    rdfs:range xsd:string .
+
+# Named Individual (should NOT be extracted by ObjectProperty module)
+ex:JohnDoe a owl:NamedIndividual, ex:Person ;
+    rdfs:label "John Doe"@en .
