@@ -113,7 +113,9 @@ defmodule OntoView.Ontology.Entity.DataPropertyTest do
     end
 
     test "handles ontology with no data properties" do
-      {:ok, loaded} = ImportResolver.load_with_imports("test/support/fixtures/ontologies/valid_simple.ttl")
+      {:ok, loaded} =
+        ImportResolver.load_with_imports("test/support/fixtures/ontologies/valid_simple.ttl")
+
       store = TripleStore.from_loaded_ontologies(loaded)
 
       properties = DataProperty.extract_all(store)
@@ -320,7 +322,9 @@ defmodule OntoView.Ontology.Entity.DataPropertyTest do
     end
 
     test "returns zero for store with no data properties" do
-      {:ok, loaded} = ImportResolver.load_with_imports("test/support/fixtures/ontologies/valid_simple.ttl")
+      {:ok, loaded} =
+        ImportResolver.load_with_imports("test/support/fixtures/ontologies/valid_simple.ttl")
+
       store = TripleStore.from_loaded_ontologies(loaded)
 
       count = DataProperty.count(store)
@@ -368,7 +372,8 @@ defmodule OntoView.Ontology.Entity.DataPropertyTest do
     test "returns {:error, :not_found} for non-existent property" do
       store = load_fixture()
 
-      assert {:error, :not_found} = DataProperty.get(store, "http://example.org/dataprops#NonExistent")
+      assert {:error, {:not_found, _}} =
+               DataProperty.get(store, "http://example.org/dataprops#NonExistent")
     end
 
     test "returns property with all domain and range associations" do

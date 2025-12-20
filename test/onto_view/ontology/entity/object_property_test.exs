@@ -362,11 +362,13 @@ defmodule OntoView.Ontology.Entity.ObjectPropertyTest do
     end
 
     test "returns {:error, :not_found} for non-existent property", %{store: store} do
-      assert {:error, :not_found} = ObjectProperty.get(store, "http://example.org/nonexistent#Foo")
+      assert {:error, {:not_found, _}} =
+               ObjectProperty.get(store, "http://example.org/nonexistent#Foo")
     end
 
     test "returns {:error, :not_found} for class IRI", %{store: store} do
-      assert {:error, :not_found} = ObjectProperty.get(store, "http://example.org/properties#Person")
+      assert {:error, {:not_found, _}} =
+               ObjectProperty.get(store, "http://example.org/properties#Person")
     end
   end
 

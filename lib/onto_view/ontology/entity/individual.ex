@@ -32,26 +32,32 @@ defmodule OntoView.Ontology.Entity.Individual do
   Each extracted individual maintains its ontology-of-origin, enabling
   per-ontology filtering in the UI and multi-set documentation.
 
+  ## Usage Examples
+
+      # Load ontology and create triple store
+      {:ok, loaded} = OntoView.Ontology.ImportResolver.load_with_imports("ontology.ttl")
+      store = OntoView.Ontology.TripleStore.from_loaded_ontologies(loaded)
+
+      # Extract all named individuals
+      individuals = Individual.extract_all(store)
+      # => [%Individual{iri: "http://example.org/alice", classes: [...], ...}]
+
+      # Extract with limit
+      first_10 = Individual.extract_all(store, limit: 10)
+
+      # Find individuals of a specific class
+      people = Individual.of_class(store, "http://example.org/Person")
+
+      # Find individuals without class associations
+      unclassified = Individual.without_class(store)
+
   Part of Task 1.3.4 — Individual Extraction
   """
 
   alias OntoView.Ontology.TripleStore
   alias OntoView.Ontology.TripleStore.Triple
-
-  # Standard OWL/RDF IRIs
-  @rdf_type {:iri, "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"}
-  @owl_named_individual {:iri, "http://www.w3.org/2002/07/owl#NamedIndividual"}
-
-  # Types to exclude from class associations
-  @excluded_types [
-    {:iri, "http://www.w3.org/2002/07/owl#NamedIndividual"},
-    {:iri, "http://www.w3.org/2002/07/owl#Class"},
-    {:iri, "http://www.w3.org/2000/01/rdf-schema#Class"},
-    {:iri, "http://www.w3.org/2002/07/owl#ObjectProperty"},
-    {:iri, "http://www.w3.org/2002/07/owl#DatatypeProperty"},
-    {:iri, "http://www.w3.org/2002/07/owl#AnnotationProperty"},
-    {:iri, "http://www.w3.org/2002/07/owl#Ontology"}
-  ]
+  alias OntoView.Ontology.Namespaces
+  alias OntoView.Ontology.Entity.Helpers
 
   @typedoc """
   Represents an OWL named individual entity.
@@ -84,6 +90,8 @@ defmodule OntoView.Ontology.Entity.Individual do
   ## Parameters
 
   - `store` - A `TripleStore.t()` containing normalized triples
+  - `opts` - Optional keyword list:
+    - `:limit` - Maximum number of individuals to return (default: `:infinity`)
 
   ## Returns
 
@@ -99,14 +107,48 @@ defmodule OntoView.Ontology.Entity.Individual do
       iex> length(individuals) >= 1
       true
   """
-  @spec extract_all(TripleStore.t()) :: [t()]
-  def extract_all(%TripleStore{} = store) do
+  @spec extract_all(TripleStore.t(), keyword()) :: [t()]
+  def extract_all(%TripleStore{} = store, opts \\ []) do
+    limit = Keyword.get(opts, :limit, :infinity)
+
+    store
+    |> extract_all_stream()
+    |> Helpers.apply_limit(limit)
+  end
+
+  @doc """
+  Returns a stream of all OWL named individuals from a triple store.
+
+  This is useful for memory-efficient processing of large ontologies,
+  as individuals are extracted lazily.
+
+  ## Parameters
+
+  - `store` - A `TripleStore.t()` containing normalized triples
+
+  ## Returns
+
+  A `Stream` of `Individual.t()` structs.
+
+  ## Examples
+
+      iex> {:ok, loaded} = OntoView.Ontology.ImportResolver.load_with_imports("test/support/fixtures/ontologies/entity_extraction/individuals.ttl")
+      iex> store = OntoView.Ontology.TripleStore.from_loaded_ontologies(loaded)
+      iex> stream = Individual.extract_all_stream(store)
+      iex> is_function(stream, 2) or is_struct(stream, Stream)
+      true
+  """
+  @spec extract_all_stream(TripleStore.t()) :: Enumerable.t()
+  def extract_all_stream(%TripleStore{} = store) do
+    rdf_type = Namespaces.rdf_type()
+    owl_named_individual = Namespaces.owl_named_individual()
+
     # Task 1.3.4.1: Detect named individuals by finding rdf:type owl:NamedIndividual
     store
-    |> TripleStore.by_predicate(@rdf_type)
-    |> Enum.filter(&(&1.object == @owl_named_individual))
-    |> Enum.filter(&match?({:iri, _}, &1.subject))
-    |> Enum.map(fn %Triple{subject: {:iri, iri}, graph: graph} ->
+    |> TripleStore.by_predicate(rdf_type)
+    |> Stream.filter(&(&1.object == owl_named_individual))
+    |> Stream.filter(&match?({:iri, _}, &1.subject))
+    |> Stream.map(fn %Triple{subject: {:iri, iri}, graph: graph} ->
       # Task 1.3.4.2: Associate individuals with their classes
       classes = extract_classes(store, iri)
 
@@ -116,7 +158,7 @@ defmodule OntoView.Ontology.Entity.Individual do
         classes: classes
       }
     end)
-    |> Enum.uniq_by(& &1.iri)
+    |> Stream.uniq_by(& &1.iri)
   end
 
   @doc """
@@ -239,7 +281,8 @@ defmodule OntoView.Ontology.Entity.Individual do
 
   ## Returns
 
-  `{:ok, individual}` if found, `{:error, :not_found}` otherwise.
+  - `{:ok, individual}` if found
+  - `{:error, {:not_found, iri: iri, entity_type: :individual}}` otherwise
 
   ## Examples
 
@@ -249,10 +292,10 @@ defmodule OntoView.Ontology.Entity.Individual do
       iex> "http://example.org/individuals#Person" in ind.classes
       true
   """
-  @spec get(TripleStore.t(), String.t()) :: {:ok, t()} | {:error, :not_found}
+  @spec get(TripleStore.t(), String.t()) :: {:ok, t()} | {:error, {:not_found, keyword()}}
   def get(%TripleStore{} = store, iri) when is_binary(iri) do
     case extract_all_as_map(store) |> Map.get(iri) do
-      nil -> {:error, :not_found}
+      nil -> Helpers.not_found_error(iri, :individual)
       individual -> {:ok, individual}
     end
   end
@@ -307,7 +350,7 @@ defmodule OntoView.Ontology.Entity.Individual do
   def of_class(%TripleStore{} = store, class_iri) when is_binary(class_iri) do
     store
     |> extract_all()
-    |> Enum.filter(&(class_iri in &1.classes))
+    |> Helpers.filter_by_membership(:classes, class_iri)
   end
 
   @doc """
@@ -346,12 +389,14 @@ defmodule OntoView.Ontology.Entity.Individual do
   @spec extract_classes(TripleStore.t(), String.t()) :: [String.t()]
   defp extract_classes(store, individual_iri) do
     individual_subject = {:iri, individual_iri}
+    rdf_type = Namespaces.rdf_type()
+    excluded_types = Namespaces.excluded_individual_types()
 
     store
     |> TripleStore.by_subject(individual_subject)
-    |> Enum.filter(&(&1.predicate == @rdf_type))
+    |> Enum.filter(&(&1.predicate == rdf_type))
     |> Enum.filter(&match?({:iri, _}, &1.object))
-    |> Enum.reject(&(&1.object in @excluded_types))
+    |> Enum.reject(&(&1.object in excluded_types))
     |> Enum.map(fn %Triple{object: {:iri, iri}} -> iri end)
   end
 end

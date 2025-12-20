@@ -101,7 +101,9 @@ defmodule OntoView.Ontology.Entity.IndividualTest do
 
     test "handles ontology with no individuals" do
       # Use a fixture that has no individuals
-      {:ok, loaded} = ImportResolver.load_with_imports("test/support/fixtures/ontologies/valid_simple.ttl")
+      {:ok, loaded} =
+        ImportResolver.load_with_imports("test/support/fixtures/ontologies/valid_simple.ttl")
+
       store = TripleStore.from_loaded_ontologies(loaded)
 
       individuals = Individual.extract_all(store)
@@ -136,7 +138,8 @@ defmodule OntoView.Ontology.Entity.IndividualTest do
 
       # Bob is only declared as Employee (not explicitly as Person)
       assert @employee_class in bob.classes
-      refute @person_class in bob.classes  # Not explicitly declared
+      # Not explicitly declared
+      refute @person_class in bob.classes
       assert length(bob.classes) == 1
     end
 
@@ -262,7 +265,9 @@ defmodule OntoView.Ontology.Entity.IndividualTest do
     end
 
     test "returns zero for store with no individuals" do
-      {:ok, loaded} = ImportResolver.load_with_imports("test/support/fixtures/ontologies/valid_simple.ttl")
+      {:ok, loaded} =
+        ImportResolver.load_with_imports("test/support/fixtures/ontologies/valid_simple.ttl")
+
       store = TripleStore.from_loaded_ontologies(loaded)
 
       count = Individual.count(store)
@@ -313,7 +318,8 @@ defmodule OntoView.Ontology.Entity.IndividualTest do
     test "returns {:error, :not_found} for non-existent individual" do
       store = load_fixture()
 
-      assert {:error, :not_found} = Individual.get(store, "http://example.org/individuals#NonExistent")
+      assert {:error, {:not_found, _}} =
+               Individual.get(store, "http://example.org/individuals#NonExistent")
     end
 
     test "returns individual with all class associations" do

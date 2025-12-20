@@ -109,7 +109,9 @@ defmodule OntoView.Ontology.Entity.EntityExtractionIntegrationTest do
 
       # No overlap between classes and properties
       for class_iri <- class_iris do
-        refute class_iri in object_prop_iris, "Class #{class_iri} should not be an object property"
+        refute class_iri in object_prop_iris,
+               "Class #{class_iri} should not be an object property"
+
         refute class_iri in data_prop_iris, "Class #{class_iri} should not be a data property"
         refute class_iri in individual_iris, "Class #{class_iri} should not be an individual"
       end
@@ -211,15 +213,23 @@ defmodule OntoView.Ontology.Entity.EntityExtractionIntegrationTest do
       # Object properties should not overlap with other types
       for prop_iri <- object_prop_iris do
         refute prop_iri in class_iris, "Object property #{prop_iri} should not be a class"
-        refute prop_iri in data_prop_iris, "Object property #{prop_iri} should not be a data property"
-        refute prop_iri in individual_iris, "Object property #{prop_iri} should not be an individual"
+
+        refute prop_iri in data_prop_iris,
+               "Object property #{prop_iri} should not be a data property"
+
+        refute prop_iri in individual_iris,
+               "Object property #{prop_iri} should not be an individual"
       end
 
       # Data properties should not overlap with other types
       for prop_iri <- data_prop_iris do
         refute prop_iri in class_iris, "Data property #{prop_iri} should not be a class"
-        refute prop_iri in object_prop_iris, "Data property #{prop_iri} should not be an object property"
-        refute prop_iri in individual_iris, "Data property #{prop_iri} should not be an individual"
+
+        refute prop_iri in object_prop_iris,
+               "Data property #{prop_iri} should not be an object property"
+
+        refute prop_iri in individual_iris,
+               "Data property #{prop_iri} should not be an individual"
       end
     end
 
@@ -281,7 +291,10 @@ defmodule OntoView.Ontology.Entity.EntityExtractionIntegrationTest do
 
       for ind_iri <- individual_iris do
         refute ind_iri in class_iris, "Individual #{ind_iri} should not be a class"
-        refute ind_iri in object_prop_iris, "Individual #{ind_iri} should not be an object property"
+
+        refute ind_iri in object_prop_iris,
+               "Individual #{ind_iri} should not be an object property"
+
         refute ind_iri in data_prop_iris, "Individual #{ind_iri} should not be a data property"
       end
     end
@@ -440,17 +453,33 @@ defmodule OntoView.Ontology.Entity.EntityExtractionIntegrationTest do
       assert total_individuals == @expected_individual_count
 
       total_entities = total_classes + total_object_props + total_data_props + total_individuals
-      assert total_entities == 20  # 6 + 4 + 5 + 5
+      # 6 + 4 + 5 + 5
+      assert total_entities == 20
     end
   end
 
   describe "multi-ontology integration" do
     test "extracts entities from multiple fixtures combined" do
       # Load all entity extraction fixtures
-      {:ok, classes_loaded} = ImportResolver.load_with_imports("test/support/fixtures/ontologies/entity_extraction/classes.ttl")
-      {:ok, obj_props_loaded} = ImportResolver.load_with_imports("test/support/fixtures/ontologies/entity_extraction/object_properties.ttl")
-      {:ok, data_props_loaded} = ImportResolver.load_with_imports("test/support/fixtures/ontologies/entity_extraction/data_properties.ttl")
-      {:ok, individuals_loaded} = ImportResolver.load_with_imports("test/support/fixtures/ontologies/entity_extraction/individuals.ttl")
+      {:ok, classes_loaded} =
+        ImportResolver.load_with_imports(
+          "test/support/fixtures/ontologies/entity_extraction/classes.ttl"
+        )
+
+      {:ok, obj_props_loaded} =
+        ImportResolver.load_with_imports(
+          "test/support/fixtures/ontologies/entity_extraction/object_properties.ttl"
+        )
+
+      {:ok, data_props_loaded} =
+        ImportResolver.load_with_imports(
+          "test/support/fixtures/ontologies/entity_extraction/data_properties.ttl"
+        )
+
+      {:ok, individuals_loaded} =
+        ImportResolver.load_with_imports(
+          "test/support/fixtures/ontologies/entity_extraction/individuals.ttl"
+        )
 
       # Create individual stores
       classes_store = TripleStore.from_loaded_ontologies(classes_loaded)
@@ -459,10 +488,14 @@ defmodule OntoView.Ontology.Entity.EntityExtractionIntegrationTest do
       individuals_store = TripleStore.from_loaded_ontologies(individuals_loaded)
 
       # Each fixture should extract its primary entity type
-      assert Class.count(classes_store) >= 6  # classes.ttl has multiple classes
-      assert ObjectProperty.count(obj_props_store) >= 9  # object_properties.ttl has multiple properties
-      assert DataProperty.count(data_props_store) >= 14  # data_properties.ttl has multiple properties
-      assert Individual.count(individuals_store) >= 9  # individuals.ttl has multiple individuals
+      # classes.ttl has multiple classes
+      assert Class.count(classes_store) >= 6
+      # object_properties.ttl has multiple properties
+      assert ObjectProperty.count(obj_props_store) >= 9
+      # data_properties.ttl has multiple properties
+      assert DataProperty.count(data_props_store) >= 14
+      # individuals.ttl has multiple individuals
+      assert Individual.count(individuals_store) >= 9
     end
 
     test "provenance tracking distinguishes source ontologies" do
@@ -483,7 +516,9 @@ defmodule OntoView.Ontology.Entity.EntityExtractionIntegrationTest do
 
   describe "error handling and edge cases" do
     test "handles empty ontology gracefully" do
-      {:ok, loaded} = ImportResolver.load_with_imports("test/support/fixtures/ontologies/empty.ttl")
+      {:ok, loaded} =
+        ImportResolver.load_with_imports("test/support/fixtures/ontologies/empty.ttl")
+
       store = TripleStore.from_loaded_ontologies(loaded)
 
       assert Class.extract_all(store) == []
@@ -495,10 +530,10 @@ defmodule OntoView.Ontology.Entity.EntityExtractionIntegrationTest do
     test "get returns :not_found for non-existent IRIs" do
       store = load_integration_fixture()
 
-      assert {:error, :not_found} = Class.get(store, "http://nonexistent.org/Class")
-      assert {:error, :not_found} = ObjectProperty.get(store, "http://nonexistent.org/Prop")
-      assert {:error, :not_found} = DataProperty.get(store, "http://nonexistent.org/Prop")
-      assert {:error, :not_found} = Individual.get(store, "http://nonexistent.org/Ind")
+      assert {:error, {:not_found, _}} = Class.get(store, "http://nonexistent.org/Class")
+      assert {:error, {:not_found, _}} = ObjectProperty.get(store, "http://nonexistent.org/Prop")
+      assert {:error, {:not_found, _}} = DataProperty.get(store, "http://nonexistent.org/Prop")
+      assert {:error, {:not_found, _}} = Individual.get(store, "http://nonexistent.org/Ind")
     end
 
     test "is_* functions return false for non-existent IRIs" do

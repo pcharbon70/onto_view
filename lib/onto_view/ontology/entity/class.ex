@@ -23,16 +23,39 @@ defmodule OntoView.Ontology.Entity.Class do
   Each extracted class maintains its ontology-of-origin, enabling
   per-ontology filtering in the UI and multi-set documentation.
 
+  ## Usage Examples
+
+      # Load ontology and create triple store
+      {:ok, loaded} = OntoView.Ontology.ImportResolver.load_with_imports("ontology.ttl")
+      store = OntoView.Ontology.TripleStore.from_loaded_ontologies(loaded)
+
+      # Extract all classes
+      classes = Class.extract_all(store)
+      # => [%Class{iri: "http://example.org/Person", ...}, ...]
+
+      # Extract with limit for large ontologies
+      first_10 = Class.extract_all(store, limit: 10)
+
+      # Use stream for memory-efficient processing
+      store
+      |> Class.extract_all_stream()
+      |> Stream.filter(&String.contains?(&1.iri, "Person"))
+      |> Enum.to_list()
+
+      # Check if an IRI is a class
+      Class.is_class?(store, "http://example.org/Person")
+      # => true
+
+      # Get a specific class
+      {:ok, person} = Class.get(store, "http://example.org/Person")
+
   Part of Task 1.3.1 — Class Extraction
   """
 
   alias OntoView.Ontology.TripleStore
   alias OntoView.Ontology.TripleStore.Triple
-
-  # Standard OWL/RDF/RDFS IRIs
-  @rdf_type {:iri, "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"}
-  @owl_class {:iri, "http://www.w3.org/2002/07/owl#Class"}
-  @rdfs_class {:iri, "http://www.w3.org/2000/01/rdf-schema#Class"}
+  alias OntoView.Ontology.Namespaces
+  alias OntoView.Ontology.Entity.Helpers
 
   @typedoc """
   Represents an OWL class entity.
@@ -66,6 +89,8 @@ defmodule OntoView.Ontology.Entity.Class do
   ## Parameters
 
   - `store` - A `TripleStore.t()` containing normalized triples
+  - `opts` - Optional keyword list:
+    - `:limit` - Maximum number of classes to return (default: `:infinity`)
 
   ## Returns
 
@@ -83,15 +108,50 @@ defmodule OntoView.Ontology.Entity.Class do
       iex> Enum.any?(classes, fn c -> String.ends_with?(c.iri, "Module") end)
       true
   """
-  @spec extract_all(TripleStore.t()) :: [t()]
-  def extract_all(%TripleStore{} = store) do
+  @spec extract_all(TripleStore.t(), keyword()) :: [t()]
+  def extract_all(%TripleStore{} = store, opts \\ []) do
+    limit = Keyword.get(opts, :limit, :infinity)
+
+    store
+    |> extract_all_stream()
+    |> Helpers.apply_limit(limit)
+  end
+
+  @doc """
+  Returns a stream of all OWL classes from a triple store.
+
+  This is useful for memory-efficient processing of large ontologies,
+  as classes are extracted lazily.
+
+  ## Parameters
+
+  - `store` - A `TripleStore.t()` containing normalized triples
+
+  ## Returns
+
+  A `Stream` of `Class.t()` structs.
+
+  ## Examples
+
+      iex> {:ok, loaded} = OntoView.Ontology.ImportResolver.load_with_imports("test/support/fixtures/ontologies/valid_simple.ttl")
+      iex> store = OntoView.Ontology.TripleStore.from_loaded_ontologies(loaded)
+      iex> stream = Class.extract_all_stream(store)
+      iex> is_function(stream, 2) or is_struct(stream, Stream)
+      true
+  """
+  @spec extract_all_stream(TripleStore.t()) :: Enumerable.t()
+  def extract_all_stream(%TripleStore{} = store) do
+    rdf_type = Namespaces.rdf_type()
+    owl_class = Namespaces.owl_class()
+    rdfs_class = Namespaces.rdfs_class()
+
     # Task 1.3.1.1: Detect owl:Class by finding rdf:type assertions
-    owl_classes = extract_classes_by_type(store, @owl_class, :owl_class)
-    rdfs_classes = extract_classes_by_type(store, @rdfs_class, :rdfs_class)
+    owl_classes = extract_classes_by_type_stream(store, rdf_type, owl_class, :owl_class)
+    rdfs_classes = extract_classes_by_type_stream(store, rdf_type, rdfs_class, :rdfs_class)
 
     # Deduplicate by IRI, preferring owl:Class over rdfs:Class
-    (owl_classes ++ rdfs_classes)
-    |> Enum.uniq_by(& &1.iri)
+    Stream.concat(owl_classes, rdfs_classes)
+    |> Stream.uniq_by(& &1.iri)
   end
 
   @doc """
@@ -220,7 +280,8 @@ defmodule OntoView.Ontology.Entity.Class do
 
   ## Returns
 
-  `{:ok, class}` if found, `{:error, :not_found}` otherwise.
+  - `{:ok, class}` if found
+  - `{:error, {:not_found, iri: iri, entity_type: :class}}` otherwise
 
   ## Examples
 
@@ -230,10 +291,10 @@ defmodule OntoView.Ontology.Entity.Class do
       iex> class.type
       :owl_class
   """
-  @spec get(TripleStore.t(), String.t()) :: {:ok, t()} | {:error, :not_found}
+  @spec get(TripleStore.t(), String.t()) :: {:ok, t()} | {:error, {:not_found, keyword()}}
   def get(%TripleStore{} = store, iri) when is_binary(iri) do
     case extract_all_as_map(store) |> Map.get(iri) do
-      nil -> {:error, :not_found}
+      nil -> Helpers.not_found_error(iri, :class)
       class -> {:ok, class}
     end
   end
@@ -266,18 +327,22 @@ defmodule OntoView.Ontology.Entity.Class do
 
   # Private functions
 
-  # Extract classes by a specific type (owl:Class or rdfs:Class)
+  # Extract classes by a specific type (owl:Class or rdfs:Class) as a stream
   # Task 1.3.1.1: Detect owl:Class
   # Task 1.3.1.2: Extract class IRIs
-  @spec extract_classes_by_type(TripleStore.t(), Triple.iri_value(), :owl_class | :rdfs_class) ::
-          [t()]
-  defp extract_classes_by_type(store, type_iri, type_atom) do
+  @spec extract_classes_by_type_stream(
+          TripleStore.t(),
+          {:iri, String.t()},
+          {:iri, String.t()},
+          :owl_class | :rdfs_class
+        ) :: Enumerable.t()
+  defp extract_classes_by_type_stream(store, rdf_type, type_iri, type_atom) do
     # Find all triples where predicate is rdf:type and object is the class type
     store
-    |> TripleStore.by_predicate(@rdf_type)
-    |> Enum.filter(&(&1.object == type_iri))
-    |> Enum.filter(&match?({:iri, _}, &1.subject))
-    |> Enum.map(fn %Triple{subject: {:iri, iri}, graph: graph} ->
+    |> TripleStore.by_predicate(rdf_type)
+    |> Stream.filter(&(&1.object == type_iri))
+    |> Stream.filter(&match?({:iri, _}, &1.subject))
+    |> Stream.map(fn %Triple{subject: {:iri, iri}, graph: graph} ->
       # Task 1.3.1.3: Attach ontology-of-origin metadata
       %__MODULE__{
         iri: iri,

@@ -32,17 +32,32 @@ defmodule OntoView.Ontology.Entity.ObjectProperty do
   Each extracted property maintains its ontology-of-origin, enabling
   per-ontology filtering in the UI and multi-set documentation.
 
+  ## Usage Examples
+
+      # Load ontology and create triple store
+      {:ok, loaded} = OntoView.Ontology.ImportResolver.load_with_imports("ontology.ttl")
+      store = OntoView.Ontology.TripleStore.from_loaded_ontologies(loaded)
+
+      # Extract all object properties
+      properties = ObjectProperty.extract_all(store)
+      # => [%ObjectProperty{iri: "http://example.org/knows", domain: [...], ...}]
+
+      # Extract with limit
+      first_5 = ObjectProperty.extract_all(store, limit: 5)
+
+      # Find properties with a specific domain
+      person_props = ObjectProperty.with_domain(store, "http://example.org/Person")
+
+      # Find properties with a specific range
+      org_props = ObjectProperty.with_range(store, "http://example.org/Organization")
+
   Part of Task 1.3.2 — Object Property Extraction
   """
 
   alias OntoView.Ontology.TripleStore
   alias OntoView.Ontology.TripleStore.Triple
-
-  # Standard OWL/RDF/RDFS IRIs
-  @rdf_type {:iri, "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"}
-  @owl_object_property {:iri, "http://www.w3.org/2002/07/owl#ObjectProperty"}
-  @rdfs_domain {:iri, "http://www.w3.org/2000/01/rdf-schema#domain"}
-  @rdfs_range {:iri, "http://www.w3.org/2000/01/rdf-schema#range"}
+  alias OntoView.Ontology.Namespaces
+  alias OntoView.Ontology.Entity.Helpers
 
   @typedoc """
   Represents an OWL object property entity.
@@ -79,6 +94,8 @@ defmodule OntoView.Ontology.Entity.ObjectProperty do
   ## Parameters
 
   - `store` - A `TripleStore.t()` containing normalized triples
+  - `opts` - Optional keyword list:
+    - `:limit` - Maximum number of properties to return (default: `:infinity`)
 
   ## Returns
 
@@ -96,17 +113,51 @@ defmodule OntoView.Ontology.Entity.ObjectProperty do
       iex> Enum.any?(props, fn p -> String.ends_with?(p.iri, "worksFor") end)
       true
   """
-  @spec extract_all(TripleStore.t()) :: [t()]
-  def extract_all(%TripleStore{} = store) do
+  @spec extract_all(TripleStore.t(), keyword()) :: [t()]
+  def extract_all(%TripleStore{} = store, opts \\ []) do
+    limit = Keyword.get(opts, :limit, :infinity)
+
+    store
+    |> extract_all_stream()
+    |> Helpers.apply_limit(limit)
+  end
+
+  @doc """
+  Returns a stream of all OWL object properties from a triple store.
+
+  This is useful for memory-efficient processing of large ontologies,
+  as properties are extracted lazily.
+
+  ## Parameters
+
+  - `store` - A `TripleStore.t()` containing normalized triples
+
+  ## Returns
+
+  A `Stream` of `ObjectProperty.t()` structs.
+
+  ## Examples
+
+      iex> {:ok, loaded} = OntoView.Ontology.ImportResolver.load_with_imports("test/support/fixtures/ontologies/entity_extraction/classes.ttl")
+      iex> store = OntoView.Ontology.TripleStore.from_loaded_ontologies(loaded)
+      iex> stream = ObjectProperty.extract_all_stream(store)
+      iex> is_function(stream, 2) or is_struct(stream, Stream)
+      true
+  """
+  @spec extract_all_stream(TripleStore.t()) :: Enumerable.t()
+  def extract_all_stream(%TripleStore{} = store) do
+    rdf_type = Namespaces.rdf_type()
+    owl_object_property = Namespaces.owl_object_property()
+
     # Task 1.3.2.1: Detect owl:ObjectProperty by finding rdf:type assertions
     store
-    |> TripleStore.by_predicate(@rdf_type)
-    |> Enum.filter(&(&1.object == @owl_object_property))
-    |> Enum.filter(&match?({:iri, _}, &1.subject))
-    |> Enum.map(fn %Triple{subject: {:iri, iri}, graph: graph} ->
-      # Task 1.3.2.2 & 1.3.2.3: Extract domain and range
-      domains = extract_domain(store, iri)
-      ranges = extract_range(store, iri)
+    |> TripleStore.by_predicate(rdf_type)
+    |> Stream.filter(&(&1.object == owl_object_property))
+    |> Stream.filter(&match?({:iri, _}, &1.subject))
+    |> Stream.map(fn %Triple{subject: {:iri, iri}, graph: graph} ->
+      # Task 1.3.2.2 & 1.3.2.3: Extract domain and range using shared helpers
+      domains = Helpers.extract_domain(store, iri)
+      ranges = Helpers.extract_range(store, iri)
 
       %__MODULE__{
         iri: iri,
@@ -115,7 +166,7 @@ defmodule OntoView.Ontology.Entity.ObjectProperty do
         range: ranges
       }
     end)
-    |> Enum.uniq_by(& &1.iri)
+    |> Stream.uniq_by(& &1.iri)
   end
 
   @doc """
@@ -240,7 +291,8 @@ defmodule OntoView.Ontology.Entity.ObjectProperty do
 
   ## Returns
 
-  `{:ok, property}` if found, `{:error, :not_found}` otherwise.
+  - `{:ok, property}` if found
+  - `{:error, {:not_found, iri: iri, entity_type: :object_property}}` otherwise
 
   ## Examples
 
@@ -250,10 +302,10 @@ defmodule OntoView.Ontology.Entity.ObjectProperty do
       iex> prop.domain
       ["http://example.org/entities#Employee"]
   """
-  @spec get(TripleStore.t(), String.t()) :: {:ok, t()} | {:error, :not_found}
+  @spec get(TripleStore.t(), String.t()) :: {:ok, t()} | {:error, {:not_found, keyword()}}
   def get(%TripleStore{} = store, iri) when is_binary(iri) do
     case extract_all_as_map(store) |> Map.get(iri) do
-      nil -> {:error, :not_found}
+      nil -> Helpers.not_found_error(iri, :object_property)
       property -> {:ok, property}
     end
   end
@@ -308,7 +360,7 @@ defmodule OntoView.Ontology.Entity.ObjectProperty do
   def with_domain(%TripleStore{} = store, domain_iri) when is_binary(domain_iri) do
     store
     |> extract_all()
-    |> Enum.filter(&(domain_iri in &1.domain))
+    |> Helpers.filter_by_membership(:domain, domain_iri)
   end
 
   @doc """
@@ -335,34 +387,6 @@ defmodule OntoView.Ontology.Entity.ObjectProperty do
   def with_range(%TripleStore{} = store, range_iri) when is_binary(range_iri) do
     store
     |> extract_all()
-    |> Enum.filter(&(range_iri in &1.range))
-  end
-
-  # Private functions
-
-  # Task 1.3.2.2: Register domain placeholders
-  # Extract all rdfs:domain declarations for a property
-  @spec extract_domain(TripleStore.t(), String.t()) :: [String.t()]
-  defp extract_domain(store, property_iri) do
-    property_subject = {:iri, property_iri}
-
-    store
-    |> TripleStore.by_subject(property_subject)
-    |> Enum.filter(&(&1.predicate == @rdfs_domain))
-    |> Enum.filter(&match?({:iri, _}, &1.object))
-    |> Enum.map(fn %Triple{object: {:iri, iri}} -> iri end)
-  end
-
-  # Task 1.3.2.3: Register range placeholders
-  # Extract all rdfs:range declarations for a property
-  @spec extract_range(TripleStore.t(), String.t()) :: [String.t()]
-  defp extract_range(store, property_iri) do
-    property_subject = {:iri, property_iri}
-
-    store
-    |> TripleStore.by_subject(property_subject)
-    |> Enum.filter(&(&1.predicate == @rdfs_range))
-    |> Enum.filter(&match?({:iri, _}, &1.object))
-    |> Enum.map(fn %Triple{object: {:iri, iri}} -> iri end)
+    |> Helpers.filter_by_membership(:range, range_iri)
   end
 end

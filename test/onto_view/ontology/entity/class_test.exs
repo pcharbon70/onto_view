@@ -189,9 +189,7 @@ defmodule OntoView.Ontology.Entity.ClassTest do
   describe "extract_all/1" do
     test "returns empty list for ontology with no classes" do
       {:ok, loaded} =
-        ImportResolver.load_with_imports(
-          "test/support/fixtures/ontologies/empty.ttl"
-        )
+        ImportResolver.load_with_imports("test/support/fixtures/ontologies/empty.ttl")
 
       store = TripleStore.from_loaded_ontologies(loaded)
       classes = Class.extract_all(store)
@@ -337,11 +335,11 @@ defmodule OntoView.Ontology.Entity.ClassTest do
     end
 
     test "returns {:error, :not_found} for non-existent class", %{store: store} do
-      assert {:error, :not_found} = Class.get(store, "http://example.org/nonexistent#Foo")
+      assert {:error, {:not_found, _}} = Class.get(store, "http://example.org/nonexistent#Foo")
     end
 
     test "returns {:error, :not_found} for property IRI", %{store: store} do
-      assert {:error, :not_found} = Class.get(store, "http://example.org/entities#worksFor")
+      assert {:error, {:not_found, _}} = Class.get(store, "http://example.org/entities#worksFor")
     end
   end
 
