@@ -235,8 +235,15 @@ imported ontologies.
 
 ### ✅ Task 1.3.4 --- Individual Extraction
 
--   [ ] 1.3.4.1 Detect named individuals\
--   [ ] 1.3.4.2 Associate individuals with their classes
+-   [x] 1.3.4.1 Detect named individuals\
+-   [x] 1.3.4.2 Associate individuals with their classes
+
+**Status:** ✅ COMPLETED (2025-12-20)
+**Implementation:** `lib/onto_view/ontology/entity/individual.ex`
+**Tests:** `test/onto_view/ontology/entity/individual_test.exs` (43 tests, 100% coverage)
+**Fixtures:**
+- `test/support/fixtures/ontologies/entity_extraction/individuals.ttl`
+**Summary:** `notes/summaries/task-1.3.4-individual-extraction-summary.md`
 
 ------------------------------------------------------------------------
 

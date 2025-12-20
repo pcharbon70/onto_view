@@ -1,0 +1,125 @@
+@prefix ex: <http://example.org/individuals#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# Ontology declaration
+<http://example.org/individuals#> a owl:Ontology ;
+    rdfs:label "Individual Extraction Test Ontology"@en ;
+    rdfs:comment "Test ontology for OWL named individual extraction (Task 1.3.4)"@en .
+
+# OWL Classes for individual membership testing
+ex:Person a owl:Class ;
+    rdfs:label "Person"@en ;
+    rdfs:comment "A human being"@en .
+
+ex:Organization a owl:Class ;
+    rdfs:label "Organization"@en ;
+    rdfs:comment "A group of people with a purpose"@en .
+
+ex:Employee a owl:Class ;
+    rdfs:label "Employee"@en ;
+    rdfs:comment "A person employed by an organization"@en ;
+    rdfs:subClassOf ex:Person .
+
+ex:Manager a owl:Class ;
+    rdfs:label "Manager"@en ;
+    rdfs:comment "An employee who manages others"@en ;
+    rdfs:subClassOf ex:Employee .
+
+ex:Project a owl:Class ;
+    rdfs:label "Project"@en ;
+    rdfs:comment "A project or work item"@en .
+
+# Object Properties for individual property testing
+ex:worksFor a owl:ObjectProperty ;
+    rdfs:label "works for"@en ;
+    rdfs:domain ex:Employee ;
+    rdfs:range ex:Organization .
+
+ex:manages a owl:ObjectProperty ;
+    rdfs:label "manages"@en ;
+    rdfs:domain ex:Manager ;
+    rdfs:range ex:Employee .
+
+ex:worksOn a owl:ObjectProperty ;
+    rdfs:label "works on"@en ;
+    rdfs:domain ex:Employee ;
+    rdfs:range ex:Project .
+
+# Data Properties for individual property testing
+ex:hasName a owl:DatatypeProperty ;
+    rdfs:label "has name"@en ;
+    rdfs:domain ex:Person ;
+    rdfs:range xsd:string .
+
+ex:hasAge a owl:DatatypeProperty ;
+    rdfs:label "has age"@en ;
+    rdfs:domain ex:Person ;
+    rdfs:range xsd:integer .
+
+ex:employeeId a owl:DatatypeProperty ;
+    rdfs:label "employee ID"@en ;
+    rdfs:domain ex:Employee ;
+    rdfs:range xsd:string .
+
+# ============================================================================
+# Named Individuals (Task 1.3.4)
+# ============================================================================
+
+# Individual with single class membership (Task 1.3.4.1, 1.3.4.2)
+ex:JohnDoe a owl:NamedIndividual, ex:Person ;
+    rdfs:label "John Doe"@en ;
+    ex:hasName "John Doe" ;
+    ex:hasAge 35 .
+
+# Individual with multiple class memberships (Task 1.3.4.2)
+ex:JaneSmith a owl:NamedIndividual, ex:Manager, ex:Employee, ex:Person ;
+    rdfs:label "Jane Smith"@en ;
+    ex:hasName "Jane Smith" ;
+    ex:hasAge 42 ;
+    ex:employeeId "EMP001" .
+
+# Individual with hierarchy class membership (subclass chain)
+ex:BobJohnson a owl:NamedIndividual, ex:Employee ;
+    rdfs:label "Bob Johnson"@en ;
+    ex:hasName "Bob Johnson" ;
+    ex:hasAge 28 ;
+    ex:employeeId "EMP002" .
+
+# Individual that is an Organization
+ex:AcmeCorp a owl:NamedIndividual, ex:Organization ;
+    rdfs:label "Acme Corporation"@en .
+
+# Individual that is a Project
+ex:ProjectAlpha a owl:NamedIndividual, ex:Project ;
+    rdfs:label "Project Alpha"@en .
+
+# Individual with no class membership (just owl:NamedIndividual)
+ex:UnclassifiedEntity a owl:NamedIndividual ;
+    rdfs:label "Unclassified Entity"@en ;
+    rdfs:comment "An individual with no class membership"@en .
+
+# Individual with relationships to other individuals
+ex:AliceWilliams a owl:NamedIndividual, ex:Employee ;
+    rdfs:label "Alice Williams"@en ;
+    ex:hasName "Alice Williams" ;
+    ex:hasAge 31 ;
+    ex:employeeId "EMP003" ;
+    ex:worksFor ex:AcmeCorp ;
+    ex:worksOn ex:ProjectAlpha .
+
+# Manager individual with manages relationship
+ex:CarolDavis a owl:NamedIndividual, ex:Manager ;
+    rdfs:label "Carol Davis"@en ;
+    ex:hasName "Carol Davis" ;
+    ex:hasAge 45 ;
+    ex:employeeId "EMP004" ;
+    ex:worksFor ex:AcmeCorp ;
+    ex:manages ex:AliceWilliams ;
+    ex:manages ex:BobJohnson .
+
+# Another organization for testing
+ex:TechStartup a owl:NamedIndividual, ex:Organization ;
+    rdfs:label "Tech Startup Inc."@en .
