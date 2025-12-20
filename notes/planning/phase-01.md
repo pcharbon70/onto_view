@@ -228,8 +228,15 @@ imported ontologies.
 
 ### ✅ Task 1.3.3 --- Data Property Extraction
 
--   [ ] 1.3.3.1 Detect `owl:DataProperty`\
--   [ ] 1.3.3.2 Register datatype ranges
+-   [x] 1.3.3.1 Detect `owl:DatatypeProperty`\
+-   [x] 1.3.3.2 Register datatype ranges
+
+**Status:** ✅ COMPLETED (2025-12-20)
+**Implementation:** `lib/onto_view/ontology/entity/data_property.ex`
+**Tests:** `test/onto_view/ontology/entity/data_property_test.exs` (55 tests, 100% coverage)
+**Fixtures:**
+- `test/support/fixtures/ontologies/entity_extraction/data_properties.ttl`
+**Summary:** `notes/summaries/task-1.3.3-data-property-extraction-summary.md`
 
 ------------------------------------------------------------------------
 

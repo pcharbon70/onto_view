@@ -1,0 +1,138 @@
+@prefix ex: <http://example.org/dataprops#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# Ontology declaration
+<http://example.org/dataprops#> a owl:Ontology ;
+    rdfs:label "Data Property Extraction Test Ontology"@en ;
+    rdfs:comment "Test ontology for OWL data property extraction (Task 1.3.3)"@en .
+
+# OWL Classes for domain testing
+ex:Person a owl:Class ;
+    rdfs:label "Person"@en ;
+    rdfs:comment "A human being"@en .
+
+ex:Organization a owl:Class ;
+    rdfs:label "Organization"@en ;
+    rdfs:comment "A group of people with a purpose"@en .
+
+ex:Product a owl:Class ;
+    rdfs:label "Product"@en ;
+    rdfs:comment "A product for sale"@en .
+
+ex:Event a owl:Class ;
+    rdfs:label "Event"@en ;
+    rdfs:comment "An event or happening"@en .
+
+# ============================================================================
+# Data Properties (Task 1.3.3)
+# ============================================================================
+
+# String datatype property with domain (Task 1.3.3.1, 1.3.3.2)
+ex:hasName a owl:DatatypeProperty ;
+    rdfs:label "has name"@en ;
+    rdfs:comment "The name of an entity"@en ;
+    rdfs:domain ex:Person ;
+    rdfs:range xsd:string .
+
+# Integer datatype property (Task 1.3.3.2)
+ex:hasAge a owl:DatatypeProperty ;
+    rdfs:label "has age"@en ;
+    rdfs:comment "The age in years"@en ;
+    rdfs:domain ex:Person ;
+    rdfs:range xsd:integer .
+
+# Boolean datatype property
+ex:isActive a owl:DatatypeProperty ;
+    rdfs:label "is active"@en ;
+    rdfs:comment "Whether the entity is active"@en ;
+    rdfs:domain ex:Person ;
+    rdfs:range xsd:boolean .
+
+# Date datatype property
+ex:birthDate a owl:DatatypeProperty ;
+    rdfs:label "birth date"@en ;
+    rdfs:comment "The date of birth"@en ;
+    rdfs:domain ex:Person ;
+    rdfs:range xsd:date .
+
+# DateTime datatype property
+ex:createdAt a owl:DatatypeProperty ;
+    rdfs:label "created at"@en ;
+    rdfs:comment "The creation timestamp"@en ;
+    rdfs:range xsd:dateTime .
+
+# Decimal datatype property (for prices)
+ex:hasPrice a owl:DatatypeProperty ;
+    rdfs:label "has price"@en ;
+    rdfs:comment "The price of an item"@en ;
+    rdfs:domain ex:Product ;
+    rdfs:range xsd:decimal .
+
+# Double datatype property
+ex:hasWeight a owl:DatatypeProperty ;
+    rdfs:label "has weight"@en ;
+    rdfs:comment "The weight in kilograms"@en ;
+    rdfs:domain ex:Product ;
+    rdfs:range xsd:double .
+
+# Property with multiple domains
+ex:hasDescription a owl:DatatypeProperty ;
+    rdfs:label "has description"@en ;
+    rdfs:comment "A textual description"@en ;
+    rdfs:domain ex:Person ;
+    rdfs:domain ex:Organization ;
+    rdfs:domain ex:Product ;
+    rdfs:range xsd:string .
+
+# Property with no domain (applies to any class)
+ex:hasIdentifier a owl:DatatypeProperty ;
+    rdfs:label "has identifier"@en ;
+    rdfs:comment "A unique identifier"@en ;
+    rdfs:range xsd:string .
+
+# Property with no range (untyped)
+ex:hasNote a owl:DatatypeProperty ;
+    rdfs:label "has note"@en ;
+    rdfs:comment "A note or annotation"@en ;
+    rdfs:domain ex:Person .
+
+# Property with neither domain nor range
+ex:hasValue a owl:DatatypeProperty ;
+    rdfs:label "has value"@en ;
+    rdfs:comment "A generic value property"@en .
+
+# anyURI datatype property
+ex:hasHomepage a owl:DatatypeProperty ;
+    rdfs:label "has homepage"@en ;
+    rdfs:comment "The URL of a homepage"@en ;
+    rdfs:domain ex:Person ;
+    rdfs:range xsd:anyURI .
+
+# Time datatype property
+ex:startTime a owl:DatatypeProperty ;
+    rdfs:label "start time"@en ;
+    rdfs:comment "The start time"@en ;
+    rdfs:domain ex:Event ;
+    rdfs:range xsd:time .
+
+# Duration datatype property
+ex:hasDuration a owl:DatatypeProperty ;
+    rdfs:label "has duration"@en ;
+    rdfs:comment "The duration of an event"@en ;
+    rdfs:domain ex:Event ;
+    rdfs:range xsd:duration .
+
+# Object property (should NOT be extracted as data property)
+ex:knows a owl:ObjectProperty ;
+    rdfs:label "knows"@en ;
+    rdfs:domain ex:Person ;
+    rdfs:range ex:Person .
+
+# Named Individual (should NOT be extracted as data property)
+ex:JohnDoe a owl:NamedIndividual, ex:Person ;
+    rdfs:label "John Doe"@en ;
+    ex:hasName "John Doe" ;
+    ex:hasAge 35 .
