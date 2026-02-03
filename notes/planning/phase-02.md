@@ -1,248 +1,477 @@
-# 📄 phase-2.md
+# Phase 2: CloudEvents Bridge & Textual Documentation UI
 
-## Phoenix LiveView Textual Documentation UI
-
-------------------------------------------------------------------------
-
-## 🎯 Phase 2 Objective
-
-Phase 2 delivers the **core user-facing ontology documentation
-interface** using Phoenix LiveView. Its purpose is to expose the
-canonical ontology model to users through a responsive, real-time,
-text-based UI that supports browsing, searching, filtering, and
-relationship navigation across all OWL entities.
+> **ARCHITECTURE NOTE:** This phase replaces **Phoenix LiveView** with the **web_ui + CloudEvents + Elm SPA** architecture. The UI is entirely client-side Elm, communicating via CloudEvents over WebSockets.
 
 ------------------------------------------------------------------------
 
-## 🧩 Section 2.1 --- LiveView Application Shell & Routing
+## Phase 2 Objective
 
-This section defines the **structural foundation** of the LiveView
-application, including route layout, mounting strategy, and deep-linking
-rules for ontology entities.
+Phase 2 delivers the **core user-facing ontology documentation interface**
+using the web_ui library. Its purpose is to:
 
-------------------------------------------------------------------------
-
-### ✅ Task 2.1.1 --- Phoenix LiveView Mounting Structure
-
--   [ ] 2.1.1.1 Create `OntologyLive` root LiveView\
--   [ ] 2.1.1.2 Configure LiveView layout templates\
--   [ ] 2.1.1.3 Implement shared assigns for ontology state
+1. Create the **CloudEvents bridge** between Elm frontend and backend
+2. Implement the **OntologyAgent** using `WebUi.Agent` behavior
+3. Build the **Elm SPA** with routing, state management, and navigation
+4. Expose the canonical ontology model to users through responsive, real-time,
+   text-based UI supporting browsing, searching, filtering, and relationship
+   navigation across all OWL entities
 
 ------------------------------------------------------------------------
 
-### ✅ Task 2.1.2 --- Documentation Routing Model
+## Architecture Context
 
--   [ ] 2.1.2.1 Implement `/docs` ontology landing route\
--   [ ] 2.1.2.2 Implement `/docs/classes/:id`\
--   [ ] 2.1.2.3 Implement `/docs/properties/:id`\
--   [ ] 2.1.2.4 Implement `/docs/individuals/:id`
+```mermaid
+flowchart TB
+    subgraph Frontend["Elm Frontend (Browser)"]
+        A[Router] --> B[ClassExplorer]
+        A --> C[ClassDetail]
+        A --> D[Search]
+        B --> E[TreeView Component]
+        C --> F[PropertyTable]
+        D --> G[SearchInput]
+    end
 
-------------------------------------------------------------------------
+    subgraph WebSocket["Phoenix Channel (WebSocket)"]
+        H[EventChannel]
+    end
 
-### ✅ Task 2.1.3 --- IRI ↔ URL Encoding Layer
+    subgraph Backend["Elixir Backend"]
+        I[WebUi.Dispatcher]
+        J[OntoView.OntologyAgent]
+        K[OntoView.Query]
+        L[TripleStore]
+    end
 
--   [ ] 2.1.3.1 Encode IRIs into URL-safe IDs\
--   [ ] 2.1.3.2 Decode URLs into canonical IRIs\
--   [ ] 2.1.3.3 Validate malformed identifiers
+    A -->|CloudEvent| H
+    H -->|CloudEvent| I
+    I -->|subscribe| J
+    J -->|query| K
+    K -->|SPARQL| L
 
-------------------------------------------------------------------------
+    K -->|response| J
+    J -->|CloudEvent| I
+    I -->|broadcast| H
+    H -->|CloudEvent| A
 
-### ✅ Task 2.1.99 --- Unit Tests: Routing & Mounting
-
--   [ ] 2.1.99.1 Root documentation route mounts correctly\
--   [ ] 2.1.99.2 Class deep-links resolve correctly\
--   [ ] 2.1.99.3 Property deep-links resolve correctly\
--   [ ] 2.1.99.4 Invalid routes return structured errors
-
-------------------------------------------------------------------------
-
-## 🧩 Section 2.2 --- Sidebar Accordion Class Explorer
-
-This section implements the **primary human navigation system** for
-ontology browsing using a hierarchical accordion UI.
-
-------------------------------------------------------------------------
-
-### ✅ Task 2.2.1 --- Hierarchical Class Tree Builder
-
--   [ ] 2.2.1.1 Load subclass graph into tree structure\
--   [ ] 2.2.1.2 Preserve multiple inheritance branches\
--   [ ] 2.2.1.3 Detect and mark root classes
-
-------------------------------------------------------------------------
-
-### ✅ Task 2.2.2 --- Accordion Rendering Engine
-
--   [ ] 2.2.2.1 Expand/collapse UI behavior\
--   [ ] 2.2.2.2 Recursive nested accordion rendering\
--   [ ] 2.2.2.3 Lazy expansion for large branches
+    style Frontend fill:#e3f2fd,stroke:#1565c0
+    style Backend fill:#fff3e0,stroke:#e65100
+    style WebSocket fill:#f3e5f5,stroke:#6a1b9a
+```
 
 ------------------------------------------------------------------------
 
-### ✅ Task 2.2.3 --- Alphabetical Fallback View
+## Section 2.1 --- CloudEvents Bridge Infrastructure
 
--   [ ] 2.2.3.1 Alphabetical class index generation\
--   [ ] 2.2.3.2 Toggle between hierarchy and alphabetical views
+This section establishes the **event-driven communication layer** between
+Elm frontend and Elixir backend using the web_ui library.
 
-------------------------------------------------------------------------
+### Task 2.1.1 --- Phoenix Endpoint & Router
 
-### ✅ Task 2.2.99 --- Unit Tests: Accordion Explorer
+- [ ] 2.1.1.1 Create `OntoView.Endpoint` using web_ui
+- [ ] 2.1.1.2 Configure `WebUi.EventChannel` for WebSocket
+- [ ] 2.1.1.3 Implement SPA catch-all route
+- [ ] 2.1.1.4 Configure static asset serving for Elm
 
--   [ ] 2.2.99.1 Class hierarchy renders correctly\
--   [ ] 2.2.99.2 Nested accordion expansion works\
--   [ ] 2.2.99.3 Alphabetical fallback loads correctly
+### Task 2.1.2 --- Ontology Agent
 
-------------------------------------------------------------------------
+- [ ] 2.1.2.1 Create `OntoView.OntologyAgent` using `WebUi.Agent`
+- [ ] 2.1.2.2 Subscribe to `com.onto_view.*` events
+- [ ] 2.1.2.3 Initialize with TripleStore context
+- [ ] 2.1.2.4 Implement event-to-query mapping
 
-## 🧩 Section 2.3 --- Live Search & Filtering Engine
+### Task 2.1.3 --- Application Supervision Tree
 
-This section introduces **real-time semantic filtering** for large
-ontologies to enable instant discovery of classes, properties, and
-individuals.
+- [ ] 2.1.3.1 Configure web_ui children in `application.ex`
+- [ ] 2.1.3.2 Start `WebUi.Endpoint` and `WebUi.Dispatcher`
+- [ ] 2.1.3.3 Start `OntoView.OntologyAgent`
+- [ ] 2.1.3.4 Configure TripleStore initialization
 
-------------------------------------------------------------------------
+### Task 2.1.99 --- Unit Tests: CloudEvents Bridge
 
-### ✅ Task 2.3.1 --- Full-Text Search Index
-
--   [ ] 2.3.1.1 Index class names\
--   [ ] 2.3.1.2 Index labels\
--   [ ] 2.3.1.3 Index comments and definitions
-
-------------------------------------------------------------------------
-
-### ✅ Task 2.3.2 --- Live Search Input Handling
-
--   [ ] 2.3.2.1 Debounce user keystrokes\
--   [ ] 2.3.2.2 Server-side search evaluation\
--   [ ] 2.3.2.3 Live result updates via assigns
+- [ ] 2.1.99.1 Endpoint starts correctly
+- [ ] 2.1.99.2 Agent subscribes to events
+- [ ] 2.1.99.3 Events are dispatched correctly
+- [ ] 2.1.99.4 WebSocket connection established
 
 ------------------------------------------------------------------------
 
-### ✅ Task 2.3.3 --- Ontology-Origin Filters
+## Section 2.2 --- CloudEvents Type Definitions
 
--   [ ] 2.3.3.1 Filter by ontology source\
--   [ ] 2.3.3.2 Multi-ontology intersection filtering
+This section defines the **complete event taxonomy** for onto_view,
+ensuring type safety between Elm and Elixir.
 
-------------------------------------------------------------------------
+### Task 2.2.1 --- Event Type Constants
 
-### ✅ Task 2.3.99 --- Unit Tests: Search & Filtering
+- [ ] 2.2.1.1 Define event type constants in Elixir
+- [ ] 2.2.1.2 Define event type constants in Elm
+- [ ] 2.2.1.3 Create event builder functions
+- [ ] 2.2.1.4 Document event data schemas
 
--   [ ] 2.3.99.1 Partial string matches work\
--   [ ] 2.3.99.2 Label-based searching works\
--   [ ] 2.3.99.3 Ontology-origin filtering works
+### Task 2.2.2 --- Request Events (Client → Server)
 
-------------------------------------------------------------------------
+- [ ] 2.2.2.1 `com.onto_view.class.search` - Search classes
+- [ ] 2.2.2.2 `com.onto_view.class.selected` - Load class details
+- [ ] 2.2.2.3 `com.onto_view.class.expanded` - Expand tree node
+- [ ] 2.2.2.4 `com.onto_view.class.collapsed` - Collapse tree node
+- [ ] 2.2.2.5 `com.onto_view.property.selected` - Load property details
+- [ ] 2.2.2.6 `com.onto_view.individual.selected` - Load individual details
+- [ ] 2.2.2.7 `com.onto_view.ontology.reload` - Reload ontology
 
-## 🧩 Section 2.4 --- Class Documentation Detail View
+### Task 2.2.3 --- Response Events (Server → Client)
 
-This section renders the **full OWL documentation representation for a
-selected class**, including hierarchy placement, annotations, and
-semantic relationships.
+- [ ] 2.2.3.1 `com.onto_view.class.list` - Class search results
+- [ ] 2.2.3.2 `com.onto_view.class.details` - Class detail data
+- [ ] 2.2.3.3 `com.onto_view.class.children` - Tree node children
+- [ ] 2.2.3.4 `com.onto_view.property.list` - Property listings
+- [ ] 2.2.3.5 `com.onto_view.property.details` - Property detail data
+- [ ] 2.2.3.6 `com.onto_view.individual.list` - Individual listings
+- [ ] 2.2.3.7 `com.onto_view.individual.details` - Individual detail data
+- [ ] 2.2.3.8 `com.onto_view.ontology.loaded` - Ontology load confirmation
+- [ ] 2.2.3.9 `com.onto_view.error` - Error notifications
 
-------------------------------------------------------------------------
+### Task 2.2.99 --- Unit Tests: Event Types
 
-### ✅ Task 2.4.1 --- Core Class Identity Rendering
-
--   [ ] 2.4.1.1 Render class label\
--   [ ] 2.4.1.2 Render canonical IRI\
--   [ ] 2.4.1.3 Render ontology prefix\
--   [ ] 2.4.1.4 Render class type indicators
-
-------------------------------------------------------------------------
-
-### ✅ Task 2.4.2 --- Annotation & Description Panel
-
--   [ ] 2.4.2.1 Render `rdfs:comment`\
--   [ ] 2.4.2.2 Render `skos:definition`\
--   [ ] 2.4.2.3 Render multilingual annotations
-
-------------------------------------------------------------------------
-
-### ✅ Task 2.4.3 --- Class Hierarchy View
-
--   [ ] 2.4.3.1 Render direct superclasses\
--   [ ] 2.4.3.2 Render direct subclasses\
--   [ ] 2.4.3.3 Enable hyperlink traversal
+- [ ] 2.2.99.1 Event constants match Elixir and Elm
+- [ ] 2.2.99.2 Event data validates correctly
+- [ ] 2.2.99.3 Event builders create valid CloudEvents
+- [ ] 2.2.99.4 JSON encoding/decoding works
 
 ------------------------------------------------------------------------
 
-### ✅ Task 2.4.4 --- Property Relationship Panels
+## Section 2.3 --- Elm SPA Foundation
 
--   [ ] 2.4.4.1 Render outbound object properties\
--   [ ] 2.4.4.2 Render inbound object properties\
--   [ ] 2.4.4.3 Render attached data properties
+This section establishes the **Elm application foundation** including
+routing, state management, and WebSocket integration.
 
-------------------------------------------------------------------------
+### Task 2.3.1 --- Elm Application Shell
 
-### ✅ Task 2.4.5 --- Individual Instance Panel
+- [ ] 2.3.1.1 Create `Main.elm` entry point
+- [ ] 2.3.1.2 Implement Elm application architecture (Model, Msg, update, view)
+- [ ] 2.3.1.3 Integrate web_ui WebSocket module
+- [ ] 2.3.1.4 Configure ports for JavaScript interop
 
--   [ ] 2.4.5.1 Render named individuals\
--   [ ] 2.4.5.2 Link individuals to class detail view
+### Task 2.3.2 --- Client-Side Routing
 
-------------------------------------------------------------------------
+- [ ] 2.3.2.1 Implement URL route parser
+- [ ] 2.3.2.2 Define route data structure
+- [ ] 2.3.2.3 Handle browser navigation
+- [ ] 2.3.2.4 Support deep-linking to entities
 
-### ✅ Task 2.4.99 --- Unit Tests: Class Detail View
+### Task 2.3.3 --- Application State Management
 
--   [ ] 2.4.99.1 All core metadata renders correctly\
--   [ ] 2.4.99.2 Hierarchy links resolve correctly\
--   [ ] 2.4.99.3 Inbound/outbound properties resolve correctly\
--   [ ] 2.4.99.4 Individuals render correctly
+- [ ] 2.3.3.1 Define Model structure (classes, properties, individuals)
+- [ ] 2.3.3.2 Implement WebSocket connection state
+- [ ] 2.3.3.3 Add loading and error states
+- [ ] 2.3.3.4 Implement pagination cursors
 
-------------------------------------------------------------------------
+### Task 2.3.99 --- Unit Tests: Elm Foundation
 
-## 🧩 Section 2.5 --- Property & Individual Textual Views
-
-This section introduces **standalone textual documentation views** for
-object properties, data properties, and named individuals.
-
-------------------------------------------------------------------------
-
-### ✅ Task 2.5.1 --- Property Documentation View
-
--   [ ] 2.5.1.1 Render property identity panel\
--   [ ] 2.5.1.2 Render domain and range\
--   [ ] 2.5.1.3 Render property characteristics
+- [ ] 2.3.99.1 Routes parse correctly
+- [ ] 2.3.99.2 State updates work correctly
+- [ ] 2.3.99.3 WebSocket states transition correctly
 
 ------------------------------------------------------------------------
 
-### ✅ Task 2.5.2 --- Individual Documentation View
+## Section 2.4 --- Elm Component: TreeView (Class Hierarchy)
 
--   [ ] 2.5.2.1 Render individual identity\
--   [ ] 2.5.2.2 Render class membership\
--   [ ] 2.5.2.3 Render attached data values
+This section implements the **TreeView component** for hierarchical class
+exploration, following the term_ui widget pattern adapted for Elm.
 
-------------------------------------------------------------------------
+### Task 2.4.1 --- TreeView Data Structure
 
-### ✅ Task 2.5.99 --- Unit Tests: Property & Individual Views
+- [ ] 2.4.1.1 Define `TreeNode` type (id, label, children, expanded)
+- [ ] 2.4.1.2 Define `TreeState` type (selected, expanded nodes)
+- [ ] 2.4.1.3 Create tree builder from class hierarchy
+- [ ] 2.4.1.4 Support lazy loading for large branches
 
--   [ ] 2.5.99.1 Property domain/range renders correctly\
--   [ ] 2.5.99.2 Individual class membership renders correctly
+### Task 2.4.2 --- TreeView Rendering
 
-------------------------------------------------------------------------
+- [ ] 2.4.2.1 Implement recursive tree rendering
+- [ ] 2.4.2.2 Add expand/collapse indicators
+- [ ] 2.4.2.3 Highlight selected node
+- [ ] 2.4.2.4 Style tree depth with indentation
 
-## 🔗 Section 2.99 --- Phase 2 Integration Testing
+### Task 2.4.3 --- TreeView Interactions
 
-This section validates the **full end-to-end user navigation flow** of
-the textual ontology documentation system.
+- [ ] 2.4.3.1 Handle click to select node
+- [ ] 2.4.3.2 Handle click to expand/collapse
+- [ ] 2.4.3.3 Send CloudEvent on selection
+- [ ] 2.4.3.4 Send CloudEvent on expand/collapse
 
-------------------------------------------------------------------------
+### Task 2.4.99 --- Unit Tests: TreeView
 
-### ✅ Task 2.99.1 --- Hierarchical Navigation Validation
-
--   [ ] 2.99.1.1 Navigate from root class to leaf class\
--   [ ] 2.99.1.2 Navigate from subclass to superclass
-
-------------------------------------------------------------------------
-
-### ✅ Task 2.99.2 --- Hyperlink Traversal Validation
-
--   [ ] 2.99.2.1 Traverse outbound property links\
--   [ ] 2.99.2.2 Traverse inbound property links
+- [ ] 2.4.99.1 Tree renders correctly
+- [ ] 2.4.99.2 Expand/collapse toggles state
+- [ ] 2.4.99.3 Selection sends correct CloudEvent
 
 ------------------------------------------------------------------------
 
-### ✅ Task 2.99.3 --- Search & Deep-Link Validation
+## Section 2.5 --- Elm Component: SearchInput
 
--   [ ] 2.99.3.1 Locate entities via search\
--   [ ] 2.99.3.2 Open documentation via direct URL
+This section implements the **search input component** with debouncing
+and real-time results.
 
+### Task 2.5.1 --- SearchInput State
+
+- [ ] 2.5.1.1 Define `SearchState` type (query, results, loading)
+- [ ] 2.5.1.2 Implement debouncing logic
+- [ ] 2.5.1.3 Add filter state (ontology selection)
+- [ ] 2.5.1.4 Track search result cursor
+
+### Task 2.5.2 --- SearchInput Rendering
+
+- [ ] 2.5.2.1 Render search input field
+- [ ] 2.5.2.2 Render autocomplete dropdown
+- [ ] 2.5.2.3 Show loading indicator
+- [ ] 2.5.2.4 Display result count
+
+### Task 2.5.3 --- SearchInput Interactions
+
+- [ ] 2.5.3.1 Handle input changes with debounce
+- [ ] 2.5.3.2 Send CloudEvent on search
+- [ ] 2.5.3.3 Handle result selection
+- [ ] 2.5.3.4 Clear search on escape
+
+### Task 2.5.99 --- Unit Tests: SearchInput
+
+- [ ] 2.5.99.1 Debouncing works correctly
+- [ ] 2.5.99.2 Search CloudEvent is sent
+- [ ] 2.5.99.3 Results display correctly
+
+------------------------------------------------------------------------
+
+## Section 2.6 --- Elm Page: Class Explorer
+
+This section implements the **main class browsing page** with TreeView
+and search integration.
+
+### Task 2.6.1 --- ClassExplorer Model
+
+- [ ] 2.6.1.1 Define `ClassExplorerModel` type
+- [ ] 2.6.1.2 Integrate TreeView state
+- [ ] 2.6.1.3 Integrate SearchInput state
+- [ ] 2.6.1.4 Add selected class state
+
+### Task 2.6.2 --- ClassExplorer Rendering
+
+- [ ] 2.6.2.1 Render sidebar with TreeView
+- [ ] 2.6.2.2 Render search bar
+- [ ] 2.6.2.3 Render class detail panel
+- [ ] 2.6.2.4 Apply responsive layout
+
+### Task 2.6.3 --- ClassExplorer Interactions
+
+- [ ] 2.6.3.1 Handle tree node selection
+- [ ] 2.6.3.2 Handle search result selection
+- [ ] 2.6.3.3 Navigate to detail view
+- [ ] 2.6.3.4 Update URL on selection
+
+### Task 2.6.99 --- Unit Tests: ClassExplorer
+
+- [ ] 2.6.99.1 Page loads correctly
+- [ ] 2.6.99.2 Tree and search work together
+- [ ] 2.6.99.3 URL updates on navigation
+
+------------------------------------------------------------------------
+
+## Section 2.7 --- Elm Page: Class Detail View
+
+This section renders the **full OWL documentation for a selected class**.
+
+### Task 2.7.1 --- ClassDetail Model
+
+- [ ] 2.7.1.1 Define `ClassDetailModel` type
+- [ ] 2.7.1.2 Add loading state
+- [ ] 2.7.1.3 Add error state
+- [ ] 2.7.1.4 Cache class data
+
+### Task 2.7.2 --- ClassDetail Rendering
+
+- [ ] 2.7.2.1 Render class identity (label, IRI, ontology)
+- [ ] 2.7.2.2 Render description panel (comments, definitions)
+- [ ] 2.7.2.3 Render hierarchy view (superclasses, subclasses)
+- [ ] 2.7.2.4 Render property relationships (inbound, outbound)
+
+### Task 2.7.3 --- ClassDetail Interactions
+
+- [ ] 2.7.3.1 Handle click to navigate to related class
+- [ ] 2.7.3.2 Handle click to navigate to property
+- [ ] 2.7.3.3 Send CloudEvent for relationship navigation
+- [ ] 2.7.3.4 Update browser history
+
+### Task 2.7.99 --- Unit Tests: ClassDetail
+
+- [ ] 2.7.99.1 Detail view renders correctly
+- [ ] 2.7.99.2 Relationship links work
+- [ ] 2.7.99.3 CloudEvents are sent correctly
+
+------------------------------------------------------------------------
+
+## Section 2.8 --- Elm Component: PropertyTable
+
+This section implements the **property table component** for displaying
+object and data properties.
+
+### Task 2.8.1 --- PropertyTable Types
+
+- [ ] 2.8.1.1 Define `Property` type
+- [ ] 2.8.1.2 Define `PropertyTableState` type
+- [ ] 2.8.1.3 Add sorting state
+- [ ] 2.8.1.4 Add pagination state
+
+### Task 2.8.2 --- PropertyTable Rendering
+
+- [ ] 2.8.2.1 Render table with sortable headers
+- [ ] 2.8.2.2 Render property rows (domain, range, characteristics)
+- [ ] 2.8.2.3 Render property type badges
+- [ ] 2.8.2.4 Render pagination controls
+
+### Task 2.8.3 --- PropertyTable Interactions
+
+- [ ] 2.8.3.1 Handle sort column click
+- [ ] 2.8.3.2 Handle property row click
+- [ ] 2.8.3.3 Handle pagination navigation
+- [ ] 2.8.3.4 Send CloudEvent for property selection
+
+### Task 2.8.99 --- Unit Tests: PropertyTable
+
+- [ ] 2.8.99.1 Table renders correctly
+- [ ] 2.8.99.2 Sorting works
+- [ ] 2.8.99.3 Pagination works
+
+------------------------------------------------------------------------
+
+## Section 2.9 --- OntologyAgent Event Handlers
+
+This section implements the **server-side event handlers** in
+`OntoView.OntologyAgent` that bridge CloudEvents to the Query API.
+
+### Task 2.9.1 --- Class Event Handlers
+
+- [ ] 2.9.1.1 Handle `com.onto_view.class.search` → call `Query.search_classes/2`
+- [ ] 2.9.1.2 Handle `com.onto_view.class.selected` → call `Query.get_class/2`
+- [ ] 2.9.1.3 Handle `com.onto_view.class.expanded` → call `Query.get_subclasses/2`
+- [ ] 2.9.1.4 Respond with `com.onto_view.class.*` events
+
+### Task 2.9.2 --- Property Event Handlers
+
+- [ ] 2.9.2.1 Handle `com.onto_view.property.selected` → call `Query.get_property/2`
+- [ ] 2.9.2.2 Handle `com.onto_view.property.list` → call `Query.list_*_properties/1`
+- [ ] 2.9.2.3 Respond with `com.onto_view.property.*` events
+
+### Task 2.9.3 --- Individual Event Handlers
+
+- [ ] 2.9.3.1 Handle `com.onto_view.individual.selected` → call `Query.get_individual/2`
+- [ ] 2.9.3.2 Handle `com.onto_view.individual.list` → call `Query.list_individuals/1`
+- [ ] 2.9.3.3 Respond with `com.onto_view.individual.*` events
+
+### Task 2.9.4 --- Error Handling
+
+- [ ] 2.9.4.1 Catch query errors and convert to CloudEvents
+- [ ] 2.9.4.2 Send `com.onto_view.error` events
+- [ ] 2.9.4.3 Include error details and context
+
+### Task 2.9.99 --- Unit Tests: OntologyAgent
+
+- [ ] 2.9.99.1 Class queries return correct CloudEvents
+- [ ] 2.9.99.2 Property queries return correct CloudEvents
+- [ ] 2.9.99.3 Errors are converted correctly
+
+------------------------------------------------------------------------
+
+## Section 2.99 --- Phase 2 Integration Testing
+
+This section validates the **end-to-end CloudEvents flow** from Elm
+frontend through OntologyAgent to Query API and back.
+
+### Task 2.99.1 --- WebSocket Communication Flow
+
+- [ ] 2.99.1.1 Elm sends CloudEvent → server receives
+- [ ] 2.99.1.2 Agent handles event → Query API called
+- [ ] 2.99.1.3 Response CloudEvent → Elm receives
+- [ ] 2.99.1.4 UI updates with new data
+
+### Task 2.99.2 --- Navigation Flow
+
+- [ ] 2.99.2.1 Load class explorer → tree populated
+- [ ] 2.99.2.2 Click class → detail view loads
+- [ ] 2.99.2.3 Click property link → property detail loads
+- [ ] 2.99.2.4 Browser back button works
+
+### Task 2.99.3 --- Search Flow
+
+- [ ] 2.99.3.1 Type search query → debounced
+- [ ] 2.99.3.2 Results received → dropdown shows
+- [ ] 2.99.3.3 Select result → detail view loads
+- [ ] 2.99.3.4 URL updates correctly
+
+------------------------------------------------------------------------
+
+## Module Structure
+
+### Backend (Elixir)
+
+```
+lib/onto_view/
+├── agents/
+│   └── ontology_agent.ex           # WebUi.Agent implementation
+├── web/
+│   ├── endpoint.ex                 # Phoenix endpoint
+│   ├── router.ex                   # SPA routes
+│   └── telemetry.ex                # CloudEvents telemetry
+└── cloudevents/
+    ├── types.ex                    # Event type constants
+    └── builders.ex                 # Event builder functions
+```
+
+### Frontend (Elm)
+
+```
+assets/elm/src/
+├── Main.elm                        # Application entry
+├── OntoView/
+│   ├── CloudEvents.elm             # Event type definitions
+│   ├── State.elm                   # Application state
+│   ├── Routes.elm                  # URL routing
+│   ├── MsgTypes.elm                # Message union type
+│   ├── Pages/
+│   │   ├── ClassExplorer.elm       # Main browsing page
+│   │   ├── ClassDetail.elm         # Class detail view
+│   │   ├── PropertyDetail.elm      # Property detail view
+│   │   └── IndividualDetail.elm    # Individual detail view
+│   └── Components/
+│       ├── TreeView.elm            # term_ui TreeView pattern
+│       ├── SearchInput.elm         # Search with debounce
+│       ├── PropertyTable.elm       # Property listing
+│       └── DescriptionPanel.elm    # Documentation rendering
+```
+
+------------------------------------------------------------------------
+
+## CloudEvents Flow Example
+
+```mermaid
+sequenceDiagram
+    participant E as Elm Frontend
+    participant W as WebSocket
+    participant D as WebUi.Dispatcher
+    participant A as OntologyAgent
+    participant Q as OntoView.Query
+    participant T as TripleStore
+
+    E->>W: CloudEvent: class.selected
+    W->>D: Route event
+    D->>A: handle_event(event)
+    A->>Q: get_class(store, iri)
+    Q->>T: SPARQL query
+    T-->>Q: Class data
+    Q-->>A: {:ok, class_details}
+    A->>D: dispatch(class.details event)
+    D->>W: Broadcast to client
+    W-->>E: CloudEvent: class.details
+    E->>E: Update view
+```
+
+------------------------------------------------------------------------
+
+*Phase 2 planning complete. Proceed to Phase 3 for graph visualization with Elm canvas.*

@@ -1,5 +1,11 @@
 # Ontology Documentation Platform
 
+> **⚠️ STATUS: ON HOLD**
+>
+> This project is currently on hold until the `web_ui` library is completed.
+> The architecture is being migrated from Phoenix LiveView to a CloudEvents-based
+> web_ui + Elm SPA approach.
+
 This project is a **Phoenix LiveView--based ontology documentation
 system** for OWL/RDF ontologies expressed in Turtle.\
 It ingests one or more interrelated ontologies, builds a canonical
